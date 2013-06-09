@@ -1,14 +1,21 @@
 package App::webcritic::Critic;
 use Pony::Object -singleton;
-use Mojo::UserAgent;
-
+  
   protected 'config';
-  protected 'ua' => Mojo::UserAgent->new;
+  protected 'site_list' => [];
   
   sub init : Public
     {
       my $this = shift;
       $this->config = shift;
+      for my $site_conf (@{ $this->sites }) {
+        
+      }
     }
-
+  
+  sub parse_site_list : Public
+    {
+      
+    }
+  
 1;
