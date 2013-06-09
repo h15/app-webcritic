@@ -1,5 +1,6 @@
 package App::webcritic::Critic;
 use Pony::Object -singleton;
+use App::webcritic::Critic::Site;
   
   protected 'config';
   protected 'site_list' => [];
@@ -8,8 +9,9 @@ use Pony::Object -singleton;
     {
       my $this = shift;
       $this->config = shift;
-      for my $site_conf (@{ $this->sites }) {
-        
+      
+      for my $site_name (keys %{$this->config->data}) {
+        push @{ $this->site_list }, App::webcritic::Critic::Site->new();
       }
     }
   
