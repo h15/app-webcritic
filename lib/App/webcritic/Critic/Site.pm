@@ -1,7 +1,7 @@
 # Class: App::webcritic::Critic::Site
 #   Regular web site
 package App::webcritic::Critic::Site;
-use Pony::Object;
+use Pony::Object qw/App::webcritic::Critic::Logger/;
 use Socket;
 use App::webcritic::Critic::Site::Page;
 use App::webcritic::Critic::Site::Page::Link;
@@ -25,10 +25,36 @@ use App::webcritic::Critic::Site::Page::Link;
       ($this->url, $this->name) = @_;
       $this->name ||= 'Site ' . $this->url;
       ($this->domain) = ($this->url =~ m/\w+:\/\/([\w\d\-\.]+)/);
-      $this->host = inet_ntoa $this->domain;
+      $this->host = inet_aton $this->domain;
       
       my $link = App::webcritic::Critic::Site::Page::Link->new(url => $this->url);
       $this->first_page = App::webcritic::Critic::Site::Page->new($this, $link);
+      $this->add_page($this->first_page);
+    }
+  
+  sub parse : Public
+    {
+      my $this = shift;
+      $this->log_info('Start parse "'.$this->name.'"');
+      my @pool = clone $this->page_list;
+      
+      while (my $page = pop @pool) {
+        $page->parse();
+        for my $link (@{$page->link_list}) {
+          my $new_page = App::webcritic::Critic::Site::Page::Page->new($this, $link);
+          $this->add_page($new_page);
+          unshift @pool, $new_page;
+        }
+      }
+      
+      $this->log_info('"'.$this->name.'" parsed');
+    }
+  
+  sub add_page : Public
+    {
+      my $this = shift;
+      my $page = shift;
+      push @{$this->page_list}, $page;
     }
   
   # Method: get_name

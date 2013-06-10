@@ -21,7 +21,6 @@ for my $lvl (keys %$level_list) {
   };
 }
   
-  protected resource => *STDOUT;
   protected level => 'info';
   
   sub set_level : Public
@@ -39,7 +38,7 @@ for my $lvl (keys %$level_list) {
     {
       my $this = shift;
       my $content = shift;
-      my $res = $this->resource;
+      my $res = *STDIN;
       $content = $content->dump() if $content->isa('Pony::Object');
       say $res $content;
     }

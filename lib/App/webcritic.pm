@@ -1,8 +1,6 @@
 package App::webcritic;
-use Web::Query;
-
 our $VERSION = '0.01';
-$Web::Query::UserAgent = LWP::UserAgent->new(agent => "webcritic/$App::webcritic::VERSION");
+1;
 
 __END__
 

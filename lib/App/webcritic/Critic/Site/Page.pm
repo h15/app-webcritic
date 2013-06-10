@@ -2,6 +2,7 @@
 #   Site's page
 package App::webcritic::Critic::Site::Page;
 use Pony::Object qw/App::webcritic::Critic::Logger/;
+use Mojo::UserAgent;
   
   protected 'url';
   protected 'link';
@@ -24,16 +25,34 @@ use Pony::Object qw/App::webcritic::Critic::Logger/;
     {
       my $this = shift;
       ($this->site, $this->link) = @_;
-      $this->url = $this->link->url;
+      $this->url = $this->link->get_url;
       ($this->scheme) = ($this->url =~ /^(\w+):\/\//);
     }
   
   sub parse : Public
     {
       my $this = shift;
-      my @pool = ($this->url);
       
+      $this->log_info('Looking for '.$this->url);
+      my $res = App::webcritic::Critic->new->getUa->get($this->url)->res;
+      $this->code = $res->code;
       
+      $res->dom->find('a')->map(sub {
+          my $href = $_[0]->{href} or return;
+          $href = [split /#/, $href]->[0];
+          $href = $this->scheme."://".$this->domain.$href if $href =~ /^\//;
+          my $domain = $this->domain;
+          return if $href !~ /$domain/;
+          $this->add_link_by_url($href);
+      });
+    }
+  
+  sub add_link_by_url : Public
+    {
+      my $this = shift;
+      my $url = shift;
+      my $link = App::webcritic::Critic::Site::Page::Link->new(url => $url);
+      push @{$this->link_list}, $link;
     }
   
   # Method: is_visited

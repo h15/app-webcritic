@@ -3,8 +3,10 @@
 use strict;
 use warnings;
 use FindBin;
+use Pony::Object;
 
 BEGIN {
+  $Pony::Object::DEFAULT->{''}->{withExceptions} = 1;
   unshift @INC, "$FindBin::Bin/../lib";
 }
 
