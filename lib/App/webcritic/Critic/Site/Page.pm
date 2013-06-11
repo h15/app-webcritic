@@ -3,6 +3,7 @@
 package App::webcritic::Critic::Site::Page;
 use Pony::Object qw/App::webcritic::Critic::Logger/;
 use Mojo::UserAgent;
+use Time::HR;
   
   protected 'url';
   protected 'link';
@@ -29,24 +30,39 @@ use Mojo::UserAgent;
       ($this->scheme) = ($this->url =~ /^(\w+):\/\//);
     }
   
+  # Method: parse
+  #   parse page by user agent
   sub parse : Public
     {
       my $this = shift;
       
       $this->log_info('Looking for '.$this->url);
+      my $hrtime0 = gethrtime();
       my $res = App::webcritic::Critic->new->getUa->get($this->url)->res;
       $this->code = $res->code;
       
       $res->dom->find('a')->map(sub {
           my $href = $_[0]->{href} or return;
           $href = [split /#/, $href]->[0];
-          $href = $this->scheme."://".$this->domain.$href if $href =~ /^\//;
-          my $domain = $this->domain;
+          return unless defined $href;
+          
+          $href = $this->scheme."://".$this->site->get_domain.$href if $href =~ /^\//;
+          my $domain = $this->site->get_domain;
           return if $href !~ /$domain/;
+          
           $this->add_link_by_url($href);
       });
+      my $hrtime1 = gethrtime();
+      my $diff = ($hrtime1 - $hrtime0) / 1_000_000_000;
+      $this->log_info($diff);
+      $this->time = $diff;
     }
   
+  # Method: add_link_by_url
+  #   add to link_list by url
+  #
+  # Parameters:
+  #   $url - Str
   sub add_link_by_url : Public
     {
       my $this = shift;
@@ -55,6 +71,11 @@ use Mojo::UserAgent;
       push @{$this->link_list}, $link;
     }
   
+  # Method: get_link_list
+  #   getter for link_list
+  #
+  # Returns:
+  #   $this->link_list - ArrayRef
   sub get_link_list : Public
     {
       my $this = shift;

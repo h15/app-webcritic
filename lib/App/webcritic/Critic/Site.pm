@@ -42,12 +42,18 @@ use App::webcritic::Critic::Site::Page::Link;
         $page->parse();
         for my $link (@{$page->get_link_list}) {
           my $new_page = App::webcritic::Critic::Site::Page->new($this, $link);
+          next if $this->exist_page($new_page);
           $this->add_page($new_page);
           unshift @pool, $new_page;
         }
       }
       
       $this->log_info('"'.$this->name.'" parsed');
+    }
+  
+  sub exist_page : Public
+    {
+      
     }
   
   sub add_page : Public
