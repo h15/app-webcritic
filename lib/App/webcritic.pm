@@ -25,16 +25,17 @@ The simple config describes site list, their urls (url for first page) and
 local site name.
 
   {
-    "test": {
-      "url": "http://127.0.0.1:3000",
-      "name": "Test site"
-    },
-    "my first site": {
-      "url": "http://example.net",
-      "name": "My Site"
-    }
+    "site_list": [
+      {
+        "url": "http://127.0.0.1:3000",
+        "name": "Test site"
+      },
+      {
+        "url": "http://example.net",
+        "name": "Example"
+      }
+    ]
   }
-
 
 =head1 COPYRIGHT AND LICENSE
 
