@@ -1,5 +1,5 @@
-package App::webcritic::Critic::Resource::Mojo;
-use Pony::Object qw/App::webcritic::Critic::Resource::Interface/;
+package App::webcritic::Critic::UserAgent::Mojo;
+use Pony::Object qw/App::webcritic::Critic::UserAgent::Interface/;
   
   protected 'site';
   

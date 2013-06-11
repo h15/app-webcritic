@@ -1,4 +1,4 @@
-package App::webcritic::Critic::Resource::Interface;
+package App::webcritic::Critic::UserAgent::Interface;
 use Pony::Object -abstract;
 
   sub get_page : Abstract;
