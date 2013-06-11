@@ -36,12 +36,12 @@ use App::webcritic::Critic::Site::Page::Link;
     {
       my $this = shift;
       $this->log_info('Start parse "'.$this->name.'"');
-      my @pool = clone $this->page_list;
+      my @pool = @{clone $this->page_list};
       
       while (my $page = pop @pool) {
         $page->parse();
-        for my $link (@{$page->link_list}) {
-          my $new_page = App::webcritic::Critic::Site::Page::Page->new($this, $link);
+        for my $link (@{$page->get_link_list}) {
+          my $new_page = App::webcritic::Critic::Site::Page->new($this, $link);
           $this->add_page($new_page);
           unshift @pool, $new_page;
         }

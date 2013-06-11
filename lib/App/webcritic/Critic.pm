@@ -13,7 +13,7 @@ use App::webcritic::Critic::Site;
       $this->ua = Mojo::UserAgent->new;
       
       for my $site_name (keys %{$this->config->get_data}) {
-        push @{ $this->site_list }, App::webcritic::Critic::Site->new(
+        push @{$this->site_list}, App::webcritic::Critic::Site->new(
           $this->config->get_data->{$site_name}->{url},
           $this->config->get_data->{$site_name}->{name},
         );

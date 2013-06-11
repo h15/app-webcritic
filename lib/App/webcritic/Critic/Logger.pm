@@ -38,8 +38,8 @@ for my $lvl (keys %$level_list) {
     {
       my $this = shift;
       my $content = shift;
-      my $res = *STDIN;
-      $content = $content->dump() if $content->isa('Pony::Object');
+      my $res = *STDOUT;
+      #$content = $content->dump() if $content->isa('Pony::Object');
       say $res $content;
     }
   

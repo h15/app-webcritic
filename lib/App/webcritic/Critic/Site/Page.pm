@@ -55,6 +55,12 @@ use Mojo::UserAgent;
       push @{$this->link_list}, $link;
     }
   
+  sub get_link_list : Public
+    {
+      my $this = shift;
+      return $this->link_list;
+    }
+  
   # Method: is_visited
   #   does this page already visited
   #
