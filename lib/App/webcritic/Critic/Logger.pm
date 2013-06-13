@@ -1,27 +1,32 @@
 package App::webcritic::Critic::Logger;
-use Pony::Object -abstract;
+use Pony::Object;
 use Pony::Object::Throwable;
 
-my $level = 'debug';
-my $level_list = {
-  debug => 00,
-  info  => 20,
-  warn  => 40,
-  error => 60,
-  fatal => 80,
-};
-
-# Generate log_* methods
-for my $lvl (keys %$level_list) {
-  has "log_$lvl" => sub {
-    my $self = shift;
-    my $content = shift;
-    return if $level_list->{$lvl} < $level_list->{$level};
-    $self->write_log($lvl, $content);
+  protected static level => 'debug';
+  protected static level_list => {
+    debug => 00,
+    info  => 20,
+    warn  => 40,
+    error => 60,
+    fatal => 80,
   };
-}
   
-  protected level => 'info';
+  sub init : Public
+    {
+      my $this = shift;
+      
+      # Generate log_* methods
+      for my $lvl (keys %{$this->level_list}) {
+        unless ($this->can("log_$lvl")) {
+          has "log_$lvl" => sub {
+            my $self = shift;
+            my $content = shift;
+            return if $this->level_list->{$lvl} < $this->level_list->{$this->level};
+            $self->write_log($lvl, $content);
+          };
+        }
+      }
+    }
   
   sub set_level : Public
     {
@@ -29,9 +34,9 @@ for my $lvl (keys %$level_list) {
       my $new_level = shift;
       
       throw Pony::Object::Throwable("Unknown level \"$new_level\"")
-        unless exists $level_list->{$new_level};
+        unless exists $this->level_list->{$new_level};
       
-      $level = $new_level;
+      $this->level = $new_level;
     }
   
   sub write_log : Public
