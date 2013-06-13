@@ -1,5 +1,5 @@
 package App::webcritic::Critic;
-use Pony::Object -singleton;
+use Pony::Object -singleton => qw/App::webcritic::Critic::Logger/;
 use App::webcritic::Critic::Site;
   
   protected 'ua';
@@ -32,12 +32,22 @@ use App::webcritic::Critic::Site;
     {
       my $this = shift;
       $this->parse_site_list();
+      return $this;
     }
   
-  sub getUa : Public
+  sub get_ua : Public
     {
       my $this = shift;
       return $this->ua;
+    }
+  
+  sub print_result : Public
+    {
+      my $this = shift;
+      $this->log_info("Result:");
+      for my $site (@{$this->site_list}) {
+        $this->log_info($site->get_name . ' - ' . $site->get_url);
+      }
     }
   
 1;

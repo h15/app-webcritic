@@ -15,4 +15,4 @@ use App::webcritic::Config;
 
 App::webcritic::Critic->new(
   App::webcritic::Config->new(@ARGV)
-)->run;
+)->run->print_result;

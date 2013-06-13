@@ -2,7 +2,7 @@ package App::webcritic::Critic::Logger;
 use Pony::Object -abstract;
 use Pony::Object::Throwable;
 
-my $level = 'info';
+my $level = 'debug';
 my $level_list = {
   debug => 00,
   info  => 20,
@@ -17,7 +17,7 @@ for my $lvl (keys %$level_list) {
     my $self = shift;
     my $content = shift;
     return if $level_list->{$lvl} < $level_list->{$level};
-    $self->write_log($content);
+    $self->write_log($lvl, $content);
   };
 }
   
@@ -37,10 +37,10 @@ for my $lvl (keys %$level_list) {
   sub write_log : Public
     {
       my $this = shift;
-      my $content = shift;
+      my ($level, $content) = @_;
       my $res = *STDOUT;
       #$content = $content->dump() if $content->isa('Pony::Object');
-      say $res $content;
+      printf $res "[%5s] %s\n", $level, $content;
     }
   
 1;

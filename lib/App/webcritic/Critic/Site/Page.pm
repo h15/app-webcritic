@@ -38,7 +38,7 @@ use Time::HR;
       
       $this->log_info('Looking for '.$this->url);
       my $hrtime0 = gethrtime();
-      my $res = App::webcritic::Critic->new->getUa->get($this->url)->res;
+      my $res = App::webcritic::Critic->new->get_ua->get($this->url)->res;
       $this->code = $res->code;
       
       $res->dom->find('a')->map(sub {
@@ -67,6 +67,7 @@ use Time::HR;
     {
       my $this = shift;
       my $url = shift;
+      $this->log_debug('Add link '.$url);
       my $link = App::webcritic::Critic::Site::Page::Link->new(url => $url);
       push @{$this->link_list}, $link;
     }

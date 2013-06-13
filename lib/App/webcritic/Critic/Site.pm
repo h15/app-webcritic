@@ -12,6 +12,8 @@ use App::webcritic::Critic::Site::Page::Link;
   protected 'host';
   protected 'first_page';
   protected 'page_list' => [];
+  # Make 'exist_page' faster.
+  protected 'exist_page_list' => {};
   
   # Method: init
   #   Constructor
@@ -24,7 +26,7 @@ use App::webcritic::Critic::Site::Page::Link;
       my $this = shift;
       ($this->url, $this->name) = @_;
       $this->name ||= 'Site ' . $this->url;
-      ($this->domain) = ($this->url =~ m/\w+:\/\/([\w\d\-\.]+)/);
+      ($this->domain) = ($this->url =~ m/\w+:\/\/([\w\d\-\.:]+)/); # port too
       $this->host = inet_aton $this->domain;
       
       my $link = App::webcritic::Critic::Site::Page::Link->new(url => $this->url);
@@ -53,7 +55,10 @@ use App::webcritic::Critic::Site::Page::Link;
   
   sub exist_page : Public
     {
-      
+      my $this = shift;
+      my $page = shift;
+      return 1 if exists $this->exist_page_list->{$page->get_url};
+      return 0;
     }
   
   sub add_page : Public
@@ -61,6 +66,13 @@ use App::webcritic::Critic::Site::Page::Link;
       my $this = shift;
       my $page = shift;
       push @{$this->page_list}, $page;
+      $this->exist_page_list->{$page->get_url} = 1;
+    }
+  
+  sub get_url : Public
+    {
+      my $this = shift;
+      return $this->url;
     }
   
   # Method: get_name
