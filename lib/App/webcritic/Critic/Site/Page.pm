@@ -3,7 +3,7 @@
 package App::webcritic::Critic::Site::Page;
 use Pony::Object qw/App::webcritic::Critic::Logger/;
 use App::webcritic::Critic::UserAgent::Factory;
-use Time::HR;
+use Time::HiRes qw/gettimeofday/;
   
   protected 'url';
   protected 'link';
@@ -40,7 +40,7 @@ use Time::HR;
       my $this = shift;
       
       $this->log_info('Looking for '.$this->url);
-      my $hrtime0 = gethrtime();
+      my $hrtime0 = gettimeofday;
       
       my $ua = App::webcritic::Critic::UserAgent::Factory->new->get_ua($this);
       my ($code, $a_href_list, $img_src_list,
@@ -59,8 +59,8 @@ use Time::HR;
         $this->log_warn('[%d] %s', $this->code, $this->url);
       }
       
-      my $hrtime1 = gethrtime();
-      my $diff = ($hrtime1 - $hrtime0) / 1_000_000_000;
+      my $hrtime1 = gettimeofday;
+      my $diff = $hrtime1 - $hrtime0;
       $this->log_info($diff);
       $this->time = $diff;
     }
