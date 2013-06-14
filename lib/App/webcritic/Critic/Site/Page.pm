@@ -43,9 +43,15 @@ use Time::HR;
       my $hrtime0 = gethrtime();
       
       my $ua = App::webcritic::Critic::UserAgent::Factory->new->get_ua($this);
-      my ($code, $href_list) = $ua->get_page();
+      my ($code, $a_href_list, $img_src_list,
+          $link_href_list, $script_src_list, $undef_list) = $ua->get_page();
+      
       $this->code = $code;
-      $this->add_link_by_url($_) for @$href_list;
+      $this->add_link_by_url($_, 'a_href')     for @$a_href_list;
+      $this->add_link_by_url($_, 'img_src')    for @$img_src_list;
+      $this->add_link_by_url($_, 'link_href')  for @$link_href_list;
+      $this->add_link_by_url($_, 'script_src') for @$script_src_list;
+      $this->add_link_by_url($_, 'undef')      for @$undef_list;
       
       if ($this->code == 200) {
         $this->log_info('[%d] %s', $this->code, $this->url);
@@ -67,9 +73,10 @@ use Time::HR;
   sub add_link_by_url : Public
     {
       my $this = shift;
-      my $url = shift;
-      $this->log_debug('Add link '.$url);
-      my $link = App::webcritic::Critic::Site::Page::Link->new(url => $url);
+      my ($url, $type) = @_;
+      return unless defined $url;
+      $this->log_debug('Add link [%10s] %s', $type, $url);
+      my $link = App::webcritic::Critic::Site::Page::Link->new(url => $url, type => $type);
       push @{$this->link_list}, $link;
     }
   

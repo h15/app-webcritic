@@ -2,7 +2,10 @@
   "site_list": [
     {
       "url": "http://127.0.0.1:3000",
-      "name": "Test site"
+      "name": "Test site",
+      "options": {
+        "log_level": "debug"
+      }
     },
     {
       "url": "http://example.net",
