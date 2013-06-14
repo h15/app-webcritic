@@ -28,6 +28,9 @@ use Time::HR;
       ($this->site, $this->link) = @_;
       $this->url = $this->link->get_url;
       ($this->scheme) = ($this->url =~ /^(\w+):\/\//);
+      
+      $this->set_log_level($this->site->get_options->{log_level})
+        if exists $this->site->get_options->{log_level};
     }
   
   # Method: parse
@@ -43,6 +46,12 @@ use Time::HR;
       my ($code, $href_list) = $ua->get_page();
       $this->code = $code;
       $this->add_link_by_url($_) for @$href_list;
+      
+      if ($this->code == 200) {
+        $this->log_info('[%d] %s', $this->code, $this->url);
+      } else {
+        $this->log_warn('[%d] %s', $this->code, $this->url);
+      }
       
       my $hrtime1 = gethrtime();
       my $diff = ($hrtime1 - $hrtime0) / 1_000_000_000;

@@ -12,9 +12,7 @@ BEGIN {
 
 use App::webcritic::Critic;
 use App::webcritic::Config;
-use App::webcritic::Critic::Logger;
 
-App::webcritic::Critic::Logger->new;
 App::webcritic::Critic->new(
   App::webcritic::Config->new(@ARGV)
 )->run->print_result;

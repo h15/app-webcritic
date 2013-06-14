@@ -9,10 +9,17 @@ use App::webcritic::Critic::Site;
     {
       my $this = shift;
       $this->config = shift;
+      my $glob_opts = $this->config->get_data->{global}->{options};
       
+      $this->set_log_level($glob_opts->{log_level}) if exists $glob_opts->{log_level};
+      
+      # Create sites
       for my $site (@{$this->config->get_data->{site_list}}) {
+        my %options = %$glob_opts;
+        %options = (%options, %{$site->{options}}) if exists $site->{options};
+        
         push @{$this->site_list}, App::webcritic::Critic::Site->new(
-          $site->{url}, $site->{name},
+          $site->{url}, $site->{name}, \%options
         );
       }
     }

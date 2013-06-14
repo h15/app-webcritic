@@ -8,5 +8,10 @@
       "url": "http://example.net",
       "name": "Example"
     }
-  ]
+  ],
+  "global": {
+    "options": {
+      "log_level": "warn"
+    }
+  }
 }

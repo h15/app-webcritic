@@ -14,6 +14,7 @@ use App::webcritic::Critic::Site::Page::Link;
   protected 'page_list' => [];
   # Make 'exist_page' faster.
   protected 'exist_page_list' => {};
+  protected 'options';
   
   # Method: init
   #   Constructor
@@ -24,7 +25,10 @@ use App::webcritic::Critic::Site::Page::Link;
   sub init : Public
     {
       my $this = shift;
-      ($this->url, $this->name) = @_;
+      ($this->url, $this->name, $this->options) = @_;
+      
+      $this->set_log_level($this->options->{log_level}) if exists $this->options->{log_level};
+      
       $this->name ||= 'Site ' . $this->url;
       ($this->domain) = ($this->url =~ m/\w+:\/\/([\w\d\-\.:]+)/); # port too
       $this->host = inet_aton $this->domain;
@@ -32,6 +36,12 @@ use App::webcritic::Critic::Site::Page::Link;
       my $link = App::webcritic::Critic::Site::Page::Link->new(url => $this->url);
       $this->first_page = App::webcritic::Critic::Site::Page->new($this, $link);
       $this->add_page($this->first_page);
+    }
+  
+  sub get_options : Public
+    {
+      my $this = shift;
+      return $this->options;
     }
   
   sub parse : Public
