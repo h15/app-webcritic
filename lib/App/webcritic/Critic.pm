@@ -2,7 +2,6 @@ package App::webcritic::Critic;
 use Pony::Object -singleton => qw/App::webcritic::Critic::Logger/;
 use App::webcritic::Critic::Site;
   
-  protected 'ua';
   protected 'config';
   protected 'site_list' => [];
   
@@ -10,7 +9,6 @@ use App::webcritic::Critic::Site;
     {
       my $this = shift;
       $this->config = shift;
-      $this->ua = Mojo::UserAgent->new;
       
       for my $site (@{$this->config->get_data->{site_list}}) {
         push @{$this->site_list}, App::webcritic::Critic::Site->new(
@@ -33,12 +31,6 @@ use App::webcritic::Critic::Site;
       my $this = shift;
       $this->parse_site_list();
       return $this;
-    }
-  
-  sub get_ua : Public
-    {
-      my $this = shift;
-      return $this->ua;
     }
   
   sub print_result : Public

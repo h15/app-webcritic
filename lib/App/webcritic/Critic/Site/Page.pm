@@ -2,7 +2,7 @@
 #   Site's page
 package App::webcritic::Critic::Site::Page;
 use Pony::Object qw/App::webcritic::Critic::Logger/;
-use Mojo::UserAgent;
+use App::webcritic::Critic::UserAgent::Factory;
 use Time::HR;
   
   protected 'url';
@@ -38,20 +38,12 @@ use Time::HR;
       
       $this->log_info('Looking for '.$this->url);
       my $hrtime0 = gethrtime();
-      my $res = App::webcritic::Critic->new->get_ua->get($this->url)->res;
-      $this->code = $res->code;
       
-      $res->dom->find('a')->map(sub {
-          my $href = $_[0]->{href} or return;
-          $href = [split /#/, $href]->[0];
-          return unless defined $href;
-          
-          $href = $this->scheme."://".$this->site->get_domain.$href if $href =~ /^\//;
-          my $domain = $this->site->get_domain;
-          return if $href !~ /$domain/;
-          
-          $this->add_link_by_url($href);
-      });
+      my $ua = App::webcritic::Critic::UserAgent::Factory->new->get_ua($this);
+      my ($code, $href_list) = $ua->get_page();
+      $this->code = $code;
+      $this->add_link_by_url($_) for @$href_list;
+      
       my $hrtime1 = gethrtime();
       my $diff = ($hrtime1 - $hrtime0) / 1_000_000_000;
       $this->log_info($diff);
@@ -81,6 +73,12 @@ use Time::HR;
     {
       my $this = shift;
       return $this->link_list;
+    }
+  
+  sub get_site : Public
+    {
+      my $this = shift;
+      return $this->site;
     }
   
   # Method: is_visited
