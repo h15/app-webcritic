@@ -52,6 +52,7 @@ use App::webcritic::Critic::Site::Page::Link;
       
       while (my $page = pop @pool) {
         $page->parse();
+        sleep $this->options->{sleep};
         for my $link (@{$page->get_link_list}) {
           my $new_page = App::webcritic::Critic::Site::Page->new($this, $link);
           next if $this->exist_page($new_page);

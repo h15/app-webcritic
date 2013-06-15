@@ -4,7 +4,8 @@
       "url": "http://127.0.0.1:3000",
       "name": "Test site",
       "options": {
-        "log_level": "debug"
+        "log_level": "debug",
+        "sleep": 2
       }
     },
     {
@@ -14,7 +15,8 @@
   ],
   "global": {
     "options": {
-      "log_level": "warn"
+      "log_level": "warn",
+      "sleep": 1
     }
   }
 }
