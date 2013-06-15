@@ -46,7 +46,7 @@ use Time::HiRes qw/gettimeofday/;
       my ($code, $a_href_list, $img_src_list,
           $link_href_list, $script_src_list, $undef_list) = $ua->get_page();
       
-      $this->code = $code;
+      $this->code = $code || 0;
       $this->add_link_by_url($_, 'a_href')     for @$a_href_list;
       $this->add_link_by_url($_, 'img_src')    for @$img_src_list;
       $this->add_link_by_url($_, 'link_href')  for @$link_href_list;
