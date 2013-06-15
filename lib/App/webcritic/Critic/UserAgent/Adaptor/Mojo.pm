@@ -3,6 +3,8 @@ use Pony::Object qw/App::webcritic::Critic::UserAgent::Interface/;
 use Mojo::UserAgent;
   
   protected 'page';
+  protected static 'scheme_list' => [qw/http https ftp/];
+  protected static 'url_chars' => '\w\d\.\\\/+\-_%~#&?:';
   
   sub init : Public
     {
@@ -26,40 +28,54 @@ use Mojo::UserAgent;
       my @pool = ($this->page->get_url);
       
       my $res = Mojo::UserAgent->new->get($this->page->get_url)->res;
+      my $content = $res->content->{asset}->{content};
       my $code = $res->code;
-      my (@a_href_list, @img_src_list, @link_href_list,
-          @script_src_list, @undef_list);
+      my (%a_href_list, %img_src_list, %link_href_list,
+          %script_src_list, %undef_list);
       
       # a href
       $res->dom->find('a')->map(sub {
         my $href = $_[0]->{href} or return;
         $href = $this->get_link($href);
-        push @a_href_list, $href;
+        $a_href_list{$href}++;
       });
       
       # img src
       $res->dom->find('img')->map(sub {
         my $src = $_[0]->{src} or return;
         $src = $this->get_link($src);
-        push @img_src_list, $src;
+        $img_src_list{$src}++;
       });
       
       # link href
       $res->dom->find('link')->map(sub {
         my $src = $_[0]->{href} or return;
         $src = $this->get_link($src);
-        push @link_href_list, $src;
+        $link_href_list{$src}++;
       });
       
       # script src
       $res->dom->find('script')->map(sub {
         my $src = $_[0]->{href} or return;
         $src = $this->get_link($src);
-        push @script_src_list, $src;
+        $script_src_list{$src}++;
       });
       
-      return $code, \@a_href_list, \@img_src_list,
-        \@link_href_list, \@script_src_list, \@undef_list;
+      my $schemes = join '|', @{$this->scheme_list};
+      my $url_chars = $this->url_chars;
+      
+      # undef
+      LOOP: {
+        if (my ($url) = ($content =~ /\G.*?((?:$schemes):\/\/[$url_chars]*)/gcis)) {
+          next if exists $a_href_list{$url} || exists $img_src_list{$url} ||
+            exists $link_href_list{$url} || exists $script_src_list{$url};
+          $undef_list{$url}++;
+          redo LOOP;
+        }
+      }
+      
+      return $code, [keys %a_href_list], [keys %img_src_list],
+        [keys %link_href_list], [keys %script_src_list], [keys %undef_list];
     }
   
   sub get_link : Protected
