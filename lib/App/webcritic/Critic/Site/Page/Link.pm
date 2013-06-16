@@ -2,16 +2,23 @@
 #   Link to some resource (like http document, css, js, etc)
 package App::webcritic::Critic::Site::Page::Link;
 use Pony::Object;
-
-my $types = {
-  undef => undef,
-  a_href => 1,
-  img_src => 2,
-  link_href => 3,
-  source_src => 4,
-};
+use Pony::Object::Throwable;
   
-  protected 'type';
+  # Var: $this->type_list
+  #   List of valid types.
+  #
+  # Access: protected static
+  protected static 'type_list' => {
+    undef => undef,
+    a_href => 1,
+    img_src => 2,
+    link_href => 3,
+    source_src => 4,
+  };
+  
+  # Var: $this->type
+  #   Valid type. See $this->type_list.
+  protected 'type' => undef;
   protected 'url';
   protected 'text' => []; # Can be defined by many attributes.
   protected 'follow' => 0; # Rel=nofollow and others.
@@ -25,8 +32,15 @@ my $types = {
   sub init : Public
     {
       my $this = shift;
-      ($this->type, $this->url, $this->text, $this->follow)
-        = @{{@_}}{qw/type url text follow/};
+      my %params = @_;
+      ($this->url, $this->text, $this->follow) = @params{qw/url text follow/};
+      my $type = $params{type};
+      
+      if (defined $type) {
+        throw Pony::Object::Throwable("Invalid link type")
+          unless exists $this->type_list->{$type};
+        $this->type = $this->type_list->{$type};
+      }
     }
   
   # Method: get_type
@@ -37,7 +51,9 @@ my $types = {
   sub get_type : Public
     {
       my $this = shift;
-      return $this->type;
+      throw Pony::Object::Throwable("Invalid link type")
+        unless exists $this->type_list->{$this->type};
+      return $this->type_list->{$this->type};
     }
   
   # Method: get_url

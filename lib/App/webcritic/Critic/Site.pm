@@ -1,5 +1,8 @@
 # Class: App::webcritic::Critic::Site
-#   Regular web site
+#   Regular web site.
+#
+# Extends:
+#   App::webcritic::Critic::Logger
 package App::webcritic::Critic::Site;
 use Pony::Object qw/App::webcritic::Critic::Logger/;
 use Socket;
@@ -22,6 +25,7 @@ use App::webcritic::Critic::Site::Page::Link;
   # Parameters:
   #   $this->url - Str - url
   #   $this->name - Str - site's name (only in critic)
+  #   $this->options - HashRef - site options
   sub init : Public
     {
       my $this = shift;
@@ -38,12 +42,19 @@ use App::webcritic::Critic::Site::Page::Link;
       $this->add_page($this->first_page);
     }
   
+  # Method: get_options
+  #   getter for options
+  #
+  # Returns:
+  #   HashRef
   sub get_options : Public
     {
       my $this = shift;
       return $this->options;
     }
   
+  # Method: parse
+  #   parse site
   sub parse : Public
     {
       my $this = shift;
@@ -64,6 +75,14 @@ use App::webcritic::Critic::Site::Page::Link;
       $this->log_info('"'.$this->name.'" parsed');
     }
   
+  # Method: exist_page
+  #   Does page already parsed?
+  #
+  # Parameters:
+  #   $page - App::webcritic::Critic::Site::Page
+  #
+  # Returns:
+  #   1|0
   sub exist_page : Public
     {
       my $this = shift;
@@ -72,6 +91,11 @@ use App::webcritic::Critic::Site::Page::Link;
       return 0;
     }
   
+  # Method: add_page
+  #   add page into page_list
+  #
+  # Parameters:
+  #   $page - App::webcritic::Critic::Site::Page
   sub add_page : Public
     {
       my $this = shift;
@@ -80,6 +104,11 @@ use App::webcritic::Critic::Site::Page::Link;
       $this->exist_page_list->{$page->get_url} = 1;
     }
   
+  # Method: get_url
+  #   getter for url
+  #
+  # Returns:
+  #   $this->url - Str
   sub get_url : Public
     {
       my $this = shift;

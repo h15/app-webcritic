@@ -1,12 +1,17 @@
 # Class: App::webcritic::Critic::Site::Page
 #   Site's page
+#
+# Extends:
+#   App::webcritic::Critic::Logger
 package App::webcritic::Critic::Site::Page;
 use Pony::Object qw/App::webcritic::Critic::Logger/;
 use App::webcritic::Critic::UserAgent::Factory;
+use App::webcritic::Critic::Site::Page::Content;
 use Time::HiRes qw/gettimeofday/;
   
   protected 'url';
   protected 'link';
+  protected 'content';
   protected 'site';
   protected 'scheme';
   protected 'visited' => 0;
@@ -43,10 +48,13 @@ use Time::HiRes qw/gettimeofday/;
       my $hrtime0 = gettimeofday;
       
       my $ua = App::webcritic::Critic::UserAgent::Factory->new->get_ua($this);
-      my ($code, $a_href_list, $img_src_list,
+      my ($code, $content, $a_href_list, $img_src_list,
           $link_href_list, $script_src_list, $undef_list) = $ua->get_page();
       
       $this->code = $code || 0;
+      $this->content = App::webcritic::Critic::Site::Page::Content
+        ->new($code, $content);
+      
       $this->add_link_by_url($_, 'a_href')     for @$a_href_list;
       $this->add_link_by_url($_, 'img_src')    for @$img_src_list;
       $this->add_link_by_url($_, 'link_href')  for @$link_href_list;
@@ -80,6 +88,19 @@ use Time::HiRes qw/gettimeofday/;
       push @{$this->link_list}, $link;
     }
   
+  # Method: add_link
+  #   add link
+  #
+  # Parameters:
+  #   $link - App::webcritic::Critic::Site::Page::Link
+  sub add_link : Public
+    {
+      my $this = shift;
+      my ($link) = @_;
+      $this->log_debug('Add link [%10s] %s', $link->type, $this->url);
+      push @{$this->link_list}, $link;
+    }
+  
   # Method: get_link_list
   #   getter for link_list
   #
@@ -91,6 +112,11 @@ use Time::HiRes qw/gettimeofday/;
       return $this->link_list;
     }
   
+  # Method: get_site
+  #   Getter for site
+  #
+  # Returns:
+  #   $this->site - App::webcritic::Critic::Site
   sub get_site : Public
     {
       my $this = shift;

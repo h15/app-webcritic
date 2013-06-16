@@ -1,10 +1,22 @@
+# Class: App::webcritic::Critic
+#   The Critic.
+#   Singleton.
+#
+# Extends:
+#   App::webcritic::Critic::Logger
 package App::webcritic::Critic;
 use Pony::Object -singleton => qw/App::webcritic::Critic::Logger/;
 use App::webcritic::Critic::Site;
   
   protected 'config';
   protected 'site_list' => [];
+  protected 'policies' => [];
   
+  # Method: init
+  #   Constructor
+  #
+  # Parameters:
+  #   $this->config - App::webcritic::Config
   sub init : Public
     {
       my $this = shift;
@@ -22,8 +34,12 @@ use App::webcritic::Critic::Site;
           $site->{url}, $site->{name}, \%options
         );
       }
+      
+      # Create policies
     }
   
+  # Method: parse_site_list
+  #   parse site list
   sub parse_site_list : Public
     {
       my $this = shift;
@@ -33,6 +49,11 @@ use App::webcritic::Critic::Site;
       }
     }
   
+  # Method: run
+  #   run critic
+  #
+  # Returns:
+  #   $this - App::webcritic::Critic
   sub run : Public
     {
       my $this = shift;
@@ -40,6 +61,11 @@ use App::webcritic::Critic::Site;
       return $this;
     }
   
+  # Method: print_result
+  #   show result of critic's work
+  #
+  # Returns:
+  #   $this - App::webcritic::Critic
   sub print_result : Public
     {
       my $this = shift;
@@ -47,6 +73,20 @@ use App::webcritic::Critic::Site;
       for my $site (@{$this->site_list}) {
         $this->log_info($site->get_name . ' - ' . $site->get_url);
       }
+      return $this;
     }
   
 1;
+
+__END__
+
+=pod
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2013, Georgy Bazhukov.
+
+This program is free software, you can redistribute it and/or modify it under
+the terms of the Artistic License version 2.0.
+
+=cut

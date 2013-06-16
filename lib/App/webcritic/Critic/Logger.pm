@@ -1,9 +1,11 @@
+# Class: App::webcritic::Critic::Logger
+#   Abstract logger
 package App::webcritic::Critic::Logger;
-use Pony::Object;
+use Pony::Object -abstract;
 use Pony::Object::Throwable;
-
-  protected level => 'debug';
-  protected static level_list => {
+  
+  protected log_level => 'debug';
+  protected static log_level_list => {
     debug => 00,
     info  => 20,
     warn  => 40,
@@ -11,17 +13,28 @@ use Pony::Object::Throwable;
     fatal => 80,
   };
   
+  # Method: set_log_level
+  #   setter for log_level
+  #
+  # Parameters:
+  #   $new_level - Str - See $this->log_level_list
   sub set_log_level : Public
     {
       my $this = shift;
       my $new_level = shift;
       
-      throw Pony::Object::Throwable("Unknown level \"$new_level\"")
-        unless exists $this->level_list->{$new_level};
+      throw Pony::Object::Throwable("Invalid log level \"$new_level\"")
+        unless exists $this->log_level_list->{$new_level};
       
-      $this->level = $new_level;
+      $this->log_level = $new_level;
     }
   
+  # Method: write_log
+  #   Write messages into log
+  #
+  # Parameters:
+  #   $level - log level name
+  #   @content - Array - log info (sprintf)
   sub write_log : Public
     {
       my $this = shift;
@@ -33,44 +46,82 @@ use Pony::Object::Throwable;
       printf $res "[%5s] %s\n", $level, $content;
     }
   
+  # Method: log_debug
+  #   Log debug message
+  #
+  # Parameters:
+  #   @content - Array - message for write_log
   sub log_debug : Public
     {
       my $this = shift;
       my @content = @_;
-      return if $this->level_list->{debug} < $this->level_list->{$this->level};
+      return if $this->log_level_list->{debug} < $this->log_level_list->{$this->log_level};
       $this->write_log('debug', @content);
     }
   
+  # Method: log_info
+  #   Log info message
+  #
+  # Parameters:
+  #   @content - Array - message for write_log
   sub log_info : Public
     {
       my $this = shift;
       my @content = @_;
-      return if $this->level_list->{info} < $this->level_list->{$this->level};
+      return if $this->log_level_list->{info} < $this->log_level_list->{$this->log_level};
       $this->write_log('info', @content);
     }
   
+  # Method: log_warn
+  #   Log warning message
+  #
+  # Parameters:
+  #   @content - Array - message for write_log
   sub log_warn : Public
     {
       my $this = shift;
       my @content = @_;
-      return if $this->level_list->{warn} < $this->level_list->{$this->level};
+      return if $this->log_level_list->{warn} < $this->log_level_list->{$this->log_level};
       $this->write_log('warn', @content);
     }
   
+  # Method: log_error
+  #   Log error message
+  #
+  # Parameters:
+  #   @content - Array - message for write_log
   sub log_error : Public
     {
       my $this = shift;
       my @content = @_;
-      return if $this->level_list->{error} < $this->level_list->{$this->level};
+      return if $this->log_level_list->{error} < $this->log_level_list->{$this->log_level};
       $this->write_log('error', @content);
     }
   
+  # Method: log_fatal
+  #   Log fatal message
+  #
+  # Parameters:
+  #   @content - Array - message for write_log
   sub log_fatal : Public
     {
       my $this = shift;
       my @content = @_;
-      return if $this->level_list->{fatal} < $this->level_list->{$this->level};
+      return if $this->log_level_list->{fatal} < $this->log_level_list->{$this->log_level};
       $this->write_log('fatal', @content);
     }
   
 1;
+
+__END__
+
+=pod
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2013, Georgy Bazhukov.
+
+This program is free software, you can redistribute it and/or modify it under
+the terms of the Artistic License version 2.0.
+
+=cut

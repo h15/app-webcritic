@@ -3,28 +3,41 @@
 package App::webcritic::Critic::Site::Page::Content;
 use Pony::Object;
   
-  protected 'data';
+  protected 'code';
+  protected 'content';
   
   # Method: init
   #   Constructor
   #
   # Parameters:
-  #   $this->data - Str - Page content
+  #   $this->code - Int - HTTP code
+  #   $this->content - Str - Page content
   sub init : Public
     {
       my $this = shift;
-      $this->data = shift;
+      ($this->code, $this->content) = @_;
     }
   
-  # Method: get_data
-  #   getter for data
+  # Method: get_content
+  #   getter for content
   #
   # Returns:
-  #   $this->data - Str
-  sub get_data : Public
+  #   $this->content - Str
+  sub get_content : Public
     {
       my $this = shift;
-      return $this->data;
+      return $this->content;
+    }
+  
+  # Method: get_code
+  #   Get HTTP code
+  #
+  # Returns:
+  #   $this->code - Int - HTTP code
+  sub get_code : Public
+    {
+      my $this = shift;
+      return $this->code;
     }
   
 1;

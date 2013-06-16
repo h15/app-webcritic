@@ -1,3 +1,8 @@
+# Class: App::webcritic::Critic::UserAgent::Adaptor::Mojo
+#   UserAgent adaptor. Using Mojo::UserAgent.
+#
+# Implements:
+#   App::webcritic::Critic::UserAgent::Interface
 package App::webcritic::Critic::UserAgent::Adaptor::Mojo;
 use Pony::Object qw/App::webcritic::Critic::UserAgent::Interface/;
 use Mojo::UserAgent;
@@ -22,6 +27,7 @@ use Mojo::UserAgent;
   #
   # Returns:
   #   $code - Int - HTTP code
+  #   $content - Str - Page content
   #   \@a_href_list - ArrayRef - urls from a[href]
   #   \@img_src_list - ArrayRef - urls from img[src]
   #   \@link_href_list - ArrayRef - urls from link[href]
@@ -32,7 +38,7 @@ use Mojo::UserAgent;
       my $this = shift;
       my @pool = ($this->page->get_url);
       my $res = Mojo::UserAgent->new->get($this->page->get_url)->res ||
-        return [0, [], [], [], [], []];
+        return [0, '', [], [], [], [], []];
       
       my $content = $res->content->{asset}->{content};
       my $code = $res->{code};
@@ -94,7 +100,7 @@ use Mojo::UserAgent;
         }
       }
       
-      return $code, [keys %a_href_list], [keys %img_src_list],
+      return $code, $content, [keys %a_href_list], [keys %img_src_list],
         [keys %link_href_list], [keys %script_src_list], [keys %undef_list];
     }
   
@@ -153,3 +159,16 @@ use Mojo::UserAgent;
     }
   
 1;
+
+__END__
+
+=pod
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2013, Georgy Bazhukov.
+
+This program is free software, you can redistribute it and/or modify it under
+the terms of the Artistic License version 2.0.
+
+=cut
