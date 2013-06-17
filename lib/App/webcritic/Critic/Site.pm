@@ -6,6 +6,7 @@
 package App::webcritic::Critic::Site;
 use Pony::Object qw/App::webcritic::Critic::Logger/;
 use Socket;
+use Module::Load;
 use App::webcritic::Critic::Site::Page;
 use App::webcritic::Critic::Site::Page::Link;
 
@@ -30,7 +31,6 @@ use App::webcritic::Critic::Site::Page::Link;
     {
       my $this = shift;
       ($this->url, $this->name, $this->options) = @_;
-      
       $this->set_log_level($this->options->{log_level}) if exists $this->options->{log_level};
       
       $this->name ||= 'Site ' . $this->url;
@@ -40,6 +40,29 @@ use App::webcritic::Critic::Site::Page::Link;
       my $link = App::webcritic::Critic::Site::Page::Link->new(url => $this->url);
       $this->first_page = App::webcritic::Critic::Site::Page->new($this, $link);
       $this->add_page($this->first_page);
+    }
+  
+  # Method: check_policies
+  #   Check site policies
+  sub check_policies : Public
+    {
+      my $this = shift;
+      for my $policy (@{$this->options->{policies}->{site}}) {
+        load $policy->{module};
+        my $p = $policy->{module}->new;
+        $p->set_name($policy->{name});
+        $p->set_site($this);
+        $p->inspect;
+        
+        my $status = $p->get_status;
+        if ($status == 0) {
+          $this->log_info('All fine at policy "%s"', $policy->{name});
+        } elsif ($status == 1) {
+          $this->log_warn('Something wrong at policy "%s"', $policy->{name});
+        } elsif ($status == 2) {
+          $this->log_error('Too bad at policy "%s"', $policy->{name});
+        }
+      }
     }
   
   # Method: get_options

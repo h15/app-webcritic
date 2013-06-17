@@ -10,7 +10,6 @@ use App::webcritic::Critic::Site;
   
   protected 'config';
   protected 'site_list' => [];
-  protected 'policies' => [];
   
   # Method: init
   #   Constructor
@@ -34,8 +33,6 @@ use App::webcritic::Critic::Site;
           $site->{url}, $site->{name}, \%options
         );
       }
-      
-      # Create policies
     }
   
   # Method: parse_site_list

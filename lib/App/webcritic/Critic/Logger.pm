@@ -107,7 +107,7 @@ use Pony::Object::Throwable;
     {
       my $this = shift;
       my @content = @_;
-      return if $this->log_level_list->{fatal} < $this->log_level_list->{$this->log_level};
+      return if $this->log_level_list->{fatal} < $this->log_3level_list->{$this->log_level};
       $this->write_log('fatal', @content);
     }
   

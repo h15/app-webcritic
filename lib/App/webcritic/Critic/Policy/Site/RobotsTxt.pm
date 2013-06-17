@@ -10,7 +10,9 @@ use App::webcritic::Critic::UserAgent::Factory;
 use App::webcritic::Critic::Site::Page;
 use App::webcritic::Critic::Site::Page::Link;
   
+  protected 'name';
   protected 'site';
+  protected 'options';
   
   # Var: status
   # | Inspect status.
@@ -25,6 +27,17 @@ use App::webcritic::Critic::Site::Page::Link;
     {
       my $this = shift;
       $this->log_debug('Init RobotsTxt policy');
+    }
+  
+  # Method: set_name
+  #   setter for nam  e
+  #
+  # Parameters:
+  #   $this->name - Str
+  sub set_name : Public
+    {
+      my $this = shift;
+      $this->name = shift;
     }
   
   # Method: set_site
@@ -60,6 +73,13 @@ use App::webcritic::Critic::Site::Page::Link;
         ->new($fp->get_scheme.'://'.$this->site->get_domain.'/robots.txt');
       my $page = App::webcritic::Critic::Site::Page->new($this->site, $link);
       $page->parse;
+      $this->site->add_page($page);
+      $fp->add_link($link);
+      if ($page->get_code == 200) {
+        $this->status = 0;
+      } else {
+        $this->status = 2;
+      }
     }
   
 1;
