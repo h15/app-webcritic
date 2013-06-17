@@ -45,10 +45,19 @@ use Mojo::UserAgent;
         return 0, '', [], [], [] ,[], [];
       }
       
-      my $content = $res->content->{asset}->{content} || '';
       my $code = $res->{code};
       my (%a_href_list, %img_src_list, %link_href_list,
           %script_src_list, %undef_list);
+      
+      # Skip by content-type
+      if ($res->content->{headers}->{headers}->{'content-type'}[0][0] !~ /(?:text|html)/) {
+        $this->log_debug('%s looks like non-text/html document', $this->page->get_url);
+        return $code, '', [keys %a_href_list], [keys %img_src_list],
+          [keys %link_href_list], [keys %script_src_list], [keys %undef_list];
+      }
+      
+      # text/html/etc
+      my $content = $res->content->{asset}->{content} || '';
       
       # a href
       $res->dom->find('a')->map(sub {
