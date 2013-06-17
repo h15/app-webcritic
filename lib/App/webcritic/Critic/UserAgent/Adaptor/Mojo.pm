@@ -40,7 +40,7 @@ use Mojo::UserAgent;
       my @pool = ($this->page->get_url);
       my $res = Mojo::UserAgent->new->get($this->page->get_url)->res;
       
-      if (@{$res->{error}}) {
+      if (exists $res->{error} && @{$res->{error}}) {
         $this->log_error("%s:\n\t%s", $this->page->get_url, join "\n\t", @{$res->{error}});
         return 0, '', [], [], [] ,[], [];
       }

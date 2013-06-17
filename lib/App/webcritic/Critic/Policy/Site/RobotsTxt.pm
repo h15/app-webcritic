@@ -70,11 +70,13 @@ use App::webcritic::Critic::Site::Page::Link;
       my $fp = $this->site->get_first_page;
       my $ua = App::webcritic::Critic::UserAgent::Factory->new->get_ua;
       my $link = App::webcritic::Critic::Site::Page::Link
-        ->new($fp->get_scheme.'://'.$this->site->get_domain.'/robots.txt');
+        ->new(url => $fp->get_scheme.'://'.$this->site->get_domain.'/robots.txt');
       my $page = App::webcritic::Critic::Site::Page->new($this->site, $link);
+      
       $page->parse;
       $this->site->add_page($page);
       $fp->add_link($link);
+      
       if ($page->get_code == 200) {
         $this->status = 0;
       } else {

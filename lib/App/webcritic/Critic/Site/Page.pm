@@ -97,7 +97,7 @@ use Time::HiRes qw/gettimeofday/;
     {
       my $this = shift;
       my ($link) = @_;
-      $this->log_debug('Add link [%10s] %s', $link->type, $this->url);
+      $this->log_debug('Add link [%10s] %s', $link->get_type, $this->url);
       push @{$this->link_list}, $link;
     }
   

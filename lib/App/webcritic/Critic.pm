@@ -43,6 +43,7 @@ use App::webcritic::Critic::Site;
       
       for my $site (@{$this->site_list}) {
         $site->parse();
+        $site->check_policies();
       }
     }
   

@@ -9,7 +9,7 @@ use Pony::Object::Throwable;
   #
   # Access: protected static
   protected static 'type_list' => {
-    undef => undef,
+    undef => 0,
     a_href => 1,
     img_src => 2,
     link_href => 3,
@@ -18,7 +18,7 @@ use Pony::Object::Throwable;
   
   # Var: $this->type
   #   Valid type. See $this->type_list.
-  protected 'type' => undef;
+  protected 'type' => 0;
   protected 'url';
   protected 'text' => []; # Can be defined by many attributes.
   protected 'follow' => 0; # Rel=nofollow and others.
@@ -34,13 +34,11 @@ use Pony::Object::Throwable;
       my $this = shift;
       my %params = @_;
       ($this->url, $this->text, $this->follow) = @params{qw/url text follow/};
-      my $type = $params{type};
+      $params{type} ||= 'undef';
       
-      if (defined $type) {
-        throw Pony::Object::Throwable("Invalid link type")
-          unless exists $this->type_list->{$type};
-        $this->type = $this->type_list->{$type};
-      }
+      throw Pony::Object::Throwable("Invalid link type")
+        unless exists $this->type_list->{$params{type}};
+      $this->type = $this->type_list->{$params{type}};
     }
   
   # Method: get_type
@@ -51,9 +49,10 @@ use Pony::Object::Throwable;
   sub get_type : Public
     {
       my $this = shift;
+      my %list_type = reverse %{$this->type_list};
       throw Pony::Object::Throwable("Invalid link type")
-        unless exists $this->type_list->{$this->type};
-      return $this->type_list->{$this->type};
+        unless exists $list_type{$this->type};
+      return $list_type{$this->type};
     }
   
   # Method: get_url
