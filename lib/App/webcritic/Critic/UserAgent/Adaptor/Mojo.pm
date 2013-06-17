@@ -129,6 +129,8 @@ use Mojo::UserAgent;
       my $abs_url_re = qr/(?:$schemes):\/\/[$url_chars]*/;
       
       if ($href =~ /^$abs_url_re/) {}
+      elsif ($href =~ /^mailto:/) { return }     # skip
+      elsif ($href =~ /^javascript:/) { return } # skip
       # /hello.jpg
       elsif ($href =~ /^\//) {
         $href = $this->page->get_scheme."://".$this->page->get_site->get_domain.$href;
