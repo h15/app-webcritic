@@ -9,6 +9,8 @@ use Pony::Object qw/App::webcritic::Critic::Policy::Site::Interface
 use App::webcritic::Critic::UserAgent::Factory;
 use App::webcritic::Critic::Site::Page;
 use App::webcritic::Critic::Site::Page::Link;
+use App::webcritic;
+use WWW::RobotRules;
   
   protected 'name';
   protected 'site';
@@ -30,7 +32,7 @@ use App::webcritic::Critic::Site::Page::Link;
     }
   
   # Method: set_name
-  #   setter for nam  e
+  #   setter for name
   #
   # Parameters:
   #   $this->name - Str
@@ -74,14 +76,45 @@ use App::webcritic::Critic::Site::Page::Link;
       my $page = App::webcritic::Critic::Site::Page->new($this->site, $link);
       
       $page->parse;
+      my $text = $page->get_content->get_content;
+      if ($this->is_valid($text)) {
+        my $rules = WWW::RobotRules->new("webcritic/$App::webcritic::VERSION");
+        $rules->parse($link->get_url, $text);
+      }
       $this->site->add_page($page);
       $fp->add_link($link);
       
       if ($page->get_code == 200) {
-        $this->status = 0;
+        $this->status ||= 0;
       } else {
-        $this->status = 2;
+        $this->status = 2 if $this->status < 2;
       }
+    }
+  
+  # Method: is_valid
+  #   does robots.txt valid
+  #
+  # Parameters:
+  #   $text - Str - file content
+  #
+  # Returns:
+  #   0|1
+  sub is_valid : Public
+    {
+      my $this = shift;
+      my $text = shift;
+      
+      $text =~ s/\015\012/\012/g;
+      for my $ln (split /[\012\015]/, $text) {
+        next if $ln =~ /^\s*\#/; # comments
+        next if $ln =~ /^\s*$/;  # empty lines
+        next if $ln =~ /^\s*[\w\-]+\s*:\s*\S+\s*$/; # rules
+        
+        $this->status = 2;
+        $this->log_error("Robots.txt isn't valid");
+        return 0;
+      }
+      return 1;
     }
   
 1;

@@ -101,6 +101,17 @@ use Time::HiRes qw/gettimeofday/;
       push @{$this->link_list}, $link;
     }
   
+  # Method: get_content
+  #   getter for content
+  #
+  # Returns:
+  #   App::webcritic::Critic::Site::Page::Content
+  sub get_content : Public
+    {
+      my $this = shift;
+      return $this->content;
+    }
+  
   # Method: get_link_list
   #   getter for link_list
   #
