@@ -147,7 +147,7 @@ use Mojo::UserAgent;
       # ./hello.jpg
       elsif ($href =~ /^\.\//) {
         $href = substr $href, 2;
-        my @parts = split /\//, $this->page->get_url;
+        my @parts = split /\//, $this->page->get_url, -1;
         pop @parts;
         push @parts, $href;
         $href = join '/', @parts;
@@ -155,7 +155,7 @@ use Mojo::UserAgent;
       # ../hello.jpg
       elsif ($href =~ /^\.\.\//) {
         $href = substr $href, 3;
-        my @parts = split /\//, $this->page->get_url;
+        my @parts = split /\//, $this->page->get_url, -1;
         pop @parts;
         pop @parts;
         push @parts, $href;
@@ -163,7 +163,7 @@ use Mojo::UserAgent;
       }
       # hello.jpg
       else {
-        my @parts = split /\//, $this->page->get_url;
+        my @parts = split /\//, $this->page->get_url, -1;
         pop @parts;
         push @parts, $href;
         $href = join '/', @parts;
