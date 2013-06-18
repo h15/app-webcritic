@@ -50,7 +50,7 @@ use App::webcritic;
       
       # Skip by content-type
       if ($res->content->{headers}->{headers}->{'content-type'}[0][0] !~ /(?:text|html)/) {
-        #$this->log_debug('%s looks like non-text/html document', $this->page->get_url);
+        $this->log_debug('%s looks like non-text/html document', $this->page->get_url);
         return $code, '', [], [], [], [], [];
       }
       

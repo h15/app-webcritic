@@ -3,6 +3,7 @@
 package App::webcritic::Critic::Logger;
 use Pony::Object -abstract;
 use Pony::Object::Throwable;
+use Term::ANSIColor;
   
   protected log_level => 0;
   protected static log_level_list => {
@@ -11,6 +12,13 @@ use Pony::Object::Throwable;
     warn  => 40,
     error => 60,
     fatal => 80,
+  };
+  protected static log_color => {
+    debug => 'white',
+    info  => 'bright_white',
+    warn  => 'cyan',
+    error => 'yellow',
+    fatal => 'red',
   };
   
   # Method: set_log_level
@@ -59,7 +67,9 @@ use Pony::Object::Throwable;
       $content = sprintf $content, @content if @content;
       
       my $res = *STDOUT;
+      print color $this->log_color->{$level};
       printf $res "[%5s] %s\n", $level, $content;
+      print color 'reset';
     }
   
   # Method: log_debug
