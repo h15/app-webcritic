@@ -7,6 +7,7 @@ package App::webcritic::Critic::UserAgent::Adaptor::Mojo;
 use Pony::Object qw/App::webcritic::Critic::UserAgent::Interface
                     App::webcritic::Critic::Logger/;
 use Mojo::UserAgent;
+use App::webcritic;
   
   protected 'page';
   protected static 'scheme_list' => [qw/http https ftp/];
@@ -37,8 +38,10 @@ use Mojo::UserAgent;
   sub get_page : Public
     {
       my $this = shift;
-      my @pool = ($this->page->get_url);
-      my $res = Mojo::UserAgent->new->get($this->page->get_url)->res;
+      my $ua = Mojo::UserAgent->new;
+      $ua->name("webcritic/$App::webcritic::VERSION");
+      my $res = $ua->get($this->page->get_url)->res;
+      say dump $res;
       my $code = $res->{code};
       
       if (exists $res->{error} && @{$res->{error}}) {
@@ -46,18 +49,41 @@ use Mojo::UserAgent;
         return $code, '', [], [], [] ,[], [];
       }
       
-      my (%a_href_list, %img_src_list, %link_href_list,
-          %script_src_list, %undef_list);
-      
       # Skip by content-type
       if ($res->content->{headers}->{headers}->{'content-type'}[0][0] !~ /(?:text|html)/) {
         $this->log_debug('%s looks like non-text/html document', $this->page->get_url);
-        return $code, '', [keys %a_href_list], [keys %img_src_list],
-          [keys %link_href_list], [keys %script_src_list], [keys %undef_list];
+        return $code, '', [], [], [], [], [];
       }
       
       # text/html/etc
       my $content = $res->content->{asset}->{content} || '';
+      
+      return $this->parse($res, $code, $content);
+    }
+  
+  # Method: parse
+  #   parse the content.
+  #
+  # Parameters:
+  #   $res - Mojo::Agent res
+  #   $code - Int - HTTP code
+  #   $content - Str - response
+  #
+  # Returns:
+  #   $code - Int - HTTP code
+  #   $content - Str - Page content
+  #   \@a_href_list - ArrayRef - urls from a[href]
+  #   \@img_src_list - ArrayRef - urls from img[src]
+  #   \@link_href_list - ArrayRef - urls from link[href]
+  #   \@script_src_list - ArrayRef - urls from script[src]
+  #   \@undef_list - ArrayRef - url from other
+  sub parse : Protected
+    {
+      my $this = shift;
+      my ($res, $code, $content) = @_;
+      
+      my (%a_href_list, %img_src_list, %link_href_list,
+          %script_src_list, %undef_list);
       
       # a href
       $res->dom->find('a')->map(sub {
