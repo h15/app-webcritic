@@ -39,13 +39,13 @@ use Mojo::UserAgent;
       my $this = shift;
       my @pool = ($this->page->get_url);
       my $res = Mojo::UserAgent->new->get($this->page->get_url)->res;
+      my $code = $res->{code};
       
       if (exists $res->{error} && @{$res->{error}}) {
         $this->log_error("%s:\n\t%s", $this->page->get_url, join "\n\t", @{$res->{error}});
-        return 0, '', [], [], [] ,[], [];
+        return $code, '', [], [], [] ,[], [];
       }
       
-      my $code = $res->{code};
       my (%a_href_list, %img_src_list, %link_href_list,
           %script_src_list, %undef_list);
       

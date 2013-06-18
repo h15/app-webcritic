@@ -90,6 +90,7 @@ use App::webcritic::Critic::Site::Page::Link;
         for my $link (@{$page->get_link_list}) {
           my $new_page = App::webcritic::Critic::Site::Page->new($this, $link);
           next if $this->exist_page($new_page);
+          next if $this->is_excluded($new_page);
           $this->add_page($new_page);
           unshift @pool, $new_page;
         }
@@ -111,6 +112,25 @@ use App::webcritic::Critic::Site::Page::Link;
       my $this = shift;
       my $page = shift;
       return 1 if exists $this->exist_page_list->{$page->get_url};
+      return 0;
+    }
+  
+  # Method: is_excluded
+  #   Does this page excluded?
+  #
+  # Parameters:
+  #   $page - App::webcritic::Critic::Site::Page
+  #
+  # Returns:
+  #   1|0
+  sub is_excluded : Public
+    {
+      my $this = shift;
+      my $page = shift;
+      
+      for my $path (@{$this->options->{exclude}}) {
+        return 1 if $page->get_url =~ /$path/;
+      }
       return 0;
     }
   

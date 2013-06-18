@@ -5,7 +5,23 @@
       "name": "Test site",
       "options": {
         "log_level": "debug",
-        "sleep": 2
+        "sleep": 2,
+        "exclude": ["/pic/captcha/"],
+        "policies": {
+          "site": [
+            {
+              "name": "robots.txt",
+              "module": "App::webcritic::Critic::Policy::Site::RobotsTxt"
+            },
+            {
+              "name": "Not Found 404",
+              "module": "App::webcritic::Critic::Policy::Site::NotFound"
+            }
+          ],
+          "page": [
+            
+          ]
+        }
       }
     },
     {
