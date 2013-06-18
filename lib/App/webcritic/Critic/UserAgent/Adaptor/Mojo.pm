@@ -41,7 +41,6 @@ use App::webcritic;
       my $ua = Mojo::UserAgent->new;
       $ua->name("webcritic/$App::webcritic::VERSION");
       my $res = $ua->get($this->page->get_url)->res;
-      say dump $res;
       my $code = $res->{code};
       
       if (exists $res->{error} && @{$res->{error}}) {
@@ -51,7 +50,7 @@ use App::webcritic;
       
       # Skip by content-type
       if ($res->content->{headers}->{headers}->{'content-type'}[0][0] !~ /(?:text|html)/) {
-        $this->log_debug('%s looks like non-text/html document', $this->page->get_url);
+        #$this->log_debug('%s looks like non-text/html document', $this->page->get_url);
         return $code, '', [], [], [], [], [];
       }
       

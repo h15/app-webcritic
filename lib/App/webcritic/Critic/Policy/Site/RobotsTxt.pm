@@ -28,7 +28,7 @@ use WWW::RobotRules;
   sub init : Public
     {
       my $this = shift;
-      $this->log_debug('Init RobotsTxt policy');
+      $this->log_info('Init RobotsTxt policy');
     }
   
   # Method: set_name
@@ -51,6 +51,7 @@ use WWW::RobotRules;
     {
       my $this = shift;
       $this->site = shift;
+      $this->set_log_level($this->get_log_level);
     }
   
   # Method: get_status

@@ -4,7 +4,7 @@ package App::webcritic::Critic::Logger;
 use Pony::Object -abstract;
 use Pony::Object::Throwable;
   
-  protected log_level => 'debug';
+  protected log_level => 0;
   protected static log_level_list => {
     debug => 00,
     info  => 20,
@@ -26,7 +26,23 @@ use Pony::Object::Throwable;
       throw Pony::Object::Throwable("Invalid log level \"$new_level\"")
         unless exists $this->log_level_list->{$new_level};
       
-      $this->log_level = $new_level;
+      $this->log_level = $this->log_level_list->{$new_level};
+    }
+  
+  # Method: get_log_level
+  #   getter for log_level
+  #
+  # Returns:
+  #   Str - See $this->log_level_list
+  sub get_log_level : Public
+    {
+      my $this = shift;
+      my %list_log_level = reverse %{$this->log_level_list};
+      
+      throw Pony::Object::Throwable('Invalid log level "'.$this->log_level.'"')
+        unless exists $list_log_level{$this->log_level};
+      
+      return $list_log_level{$this->log_level};
     }
   
   # Method: write_log
@@ -55,7 +71,7 @@ use Pony::Object::Throwable;
     {
       my $this = shift;
       my @content = @_;
-      return if $this->log_level_list->{debug} < $this->log_level_list->{$this->log_level};
+      return if $this->log_level_list->{debug} < $this->log_level;
       $this->write_log('debug', @content);
     }
   
@@ -68,7 +84,7 @@ use Pony::Object::Throwable;
     {
       my $this = shift;
       my @content = @_;
-      return if $this->log_level_list->{info} < $this->log_level_list->{$this->log_level};
+      return if $this->log_level_list->{info} < $this->log_level;
       $this->write_log('info', @content);
     }
   
@@ -81,7 +97,7 @@ use Pony::Object::Throwable;
     {
       my $this = shift;
       my @content = @_;
-      return if $this->log_level_list->{warn} < $this->log_level_list->{$this->log_level};
+      return if $this->log_level_list->{warn} < $this->log_level;
       $this->write_log('warn', @content);
     }
   
@@ -94,7 +110,7 @@ use Pony::Object::Throwable;
     {
       my $this = shift;
       my @content = @_;
-      return if $this->log_level_list->{error} < $this->log_level_list->{$this->log_level};
+      return if $this->log_level_list->{error} < $this->log_level;
       $this->write_log('error', @content);
     }
   
@@ -107,7 +123,7 @@ use Pony::Object::Throwable;
     {
       my $this = shift;
       my @content = @_;
-      return if $this->log_level_list->{fatal} < $this->log_3level_list->{$this->log_level};
+      return if $this->log_level_list->{fatal} < $this->log_level;
       $this->write_log('fatal', @content);
     }
   

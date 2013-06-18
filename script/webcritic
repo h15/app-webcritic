@@ -13,6 +13,5 @@ BEGIN {
 use App::webcritic::Critic;
 use App::webcritic::Config;
 
-App::webcritic::Critic->new(
-  App::webcritic::Config->new(@ARGV)
-)->run->print_result;
+my $config = App::webcritic::Config->new(@ARGV);
+App::webcritic::Critic->new($config)->run->print_result;
