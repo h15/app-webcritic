@@ -22,6 +22,9 @@ use App::webcritic;
     {
       my $this = shift;
       $this->page = shift;
+      if ($this->page) {
+        $this->set_log_level($this->page->get_log_level);
+      }
     }
   
   # Method: get_page

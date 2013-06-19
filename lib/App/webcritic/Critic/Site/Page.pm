@@ -8,6 +8,7 @@ use Pony::Object qw/App::webcritic::Critic::Logger/;
 use App::webcritic::Critic::UserAgent::Factory;
 use App::webcritic::Critic::Site::Page::Content;
 use Time::HiRes qw/gettimeofday/;
+use Module::Load;
   
   protected 'url';
   protected 'link';
@@ -36,6 +37,29 @@ use Time::HiRes qw/gettimeofday/;
       
       $this->set_log_level($this->site->get_options->{log_level})
         if exists $this->site->get_options->{log_level};
+    }
+  
+  # Method: check_policies
+  #   Check page policies
+  sub check_policies : Public
+    {
+      my $this = shift;
+      for my $policy (@{$this->site->get_options->{policies}->{page}}) {
+        load $policy->{module};
+        my $p = $policy->{module}->new;
+        $p->set_name($policy->{name});
+        $p->set_page($this);
+        $p->inspect;
+        
+        my $status = $p->get_status;
+        if ($status == 0) {
+          $this->log_info('All fine at Policy "%s". Page: %s', $policy->{name}, $this->url);
+        } elsif ($status == 1) {
+          $this->log_warn('Something wrong at policy "%s". Page: %s', $policy->{name}, $this->url);
+        } elsif ($status == 2) {
+          $this->log_error('Too bad at policy "%s". Page: %s', $policy->{name}, $this->url);
+        }
+      }
     }
   
   # Method: parse

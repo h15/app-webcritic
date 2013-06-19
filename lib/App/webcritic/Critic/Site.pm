@@ -93,6 +93,7 @@ use App::webcritic::Critic::Site::Page::Link;
           next if $this->is_excluded($new_page);
           $this->add_page($new_page);
           unshift @pool, $new_page;
+          $new_page->check_policies();
         }
       }
       

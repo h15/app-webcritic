@@ -27,7 +27,6 @@ use Digest::MD5 'md5_hex';
   sub init : Public
     {
       my $this = shift;
-      $this->log_info('Init NotFound policy');
     }
   
   # Method: set_name
@@ -50,7 +49,8 @@ use Digest::MD5 'md5_hex';
     {
       my $this = shift;
       $this->site = shift;
-      $this->set_log_level($this->get_log_level);
+      $this->set_log_level($this->site->get_log_level);
+      $this->log_info('Start NotFound policy');
     }
   
   # Method: get_status

@@ -21,14 +21,13 @@ use WWW::RobotRules;
   # |   0 - all fine
   # |   1 - something wrong
   # |   2 - too bad
-  protected 'status';
+  protected 'status' => 0;
   
   # Method: init
   #   Constructor
   sub init : Public
     {
       my $this = shift;
-      $this->log_info('Init RobotsTxt policy');
     }
   
   # Method: set_name
@@ -51,7 +50,8 @@ use WWW::RobotRules;
     {
       my $this = shift;
       $this->site = shift;
-      $this->set_log_level($this->get_log_level);
+      $this->set_log_level($this->site->get_log_level);
+      $this->log_info('Start RobotsTxt policy');
     }
   
   # Method: get_status
