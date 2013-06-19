@@ -1,15 +1,15 @@
-# Class: App::webcritic::Critic::Policy::Site::RobotsTxt
-#   Site's policy: does robots.txt exist and valid.
+# Class: App::webcritic::Critic::Policy::Site::SiteMap
+#   Site's policy: does sitemap.xml exist and valid.
 # Extends:
 #   App::webcritic::Critic::Policy::Site::Interface
 #   App::webcritic::Critic::Logger
-package App::webcritic::Critic::Policy::Site::RobotsTxt;
+package App::webcritic::Critic::Policy::Site::SiteMap;
 use Pony::Object qw/App::webcritic::Critic::Policy::Site::Interface
                     App::webcritic::Critic::Logger/;
+use Pony::Object::Throwable;
 use App::webcritic::Critic::Site::Page;
 use App::webcritic::Critic::Site::Page::Link;
 use App::webcritic;
-use WWW::RobotRules;
   
   protected 'name';
   protected 'site';
@@ -24,9 +24,17 @@ use WWW::RobotRules;
   
   # Method: init
   #   Constructor
+  #
+  # Parameters:
+  #   $this->options - policy options
   sub init : Public
     {
       my $this = shift;
+      $this->options = shift || {};
+      # check options
+      unless (exists $this->options->{url}) {
+        throw Pony::Object::Throwable(__PACKAGE__." required 'url' option.");
+      }
     }
   
   # Method: set_name
@@ -50,7 +58,7 @@ use WWW::RobotRules;
       my $this = shift;
       $this->site = shift;
       $this->set_log_level($this->site->get_log_level);
-      $this->log_info('Start RobotsTxt policy');
+      $this->log_info('Start SiteMap policy');
     }
   
   # Method: get_status
@@ -71,49 +79,15 @@ use WWW::RobotRules;
       my $this = shift;
       my $fp = $this->site->get_first_page;
       my $link = App::webcritic::Critic::Site::Page::Link
-        ->new(url => $fp->get_scheme.'://'.$this->site->get_domain.'/robots.txt');
+        ->new(url => $fp->get_scheme.'://'.$this->site->get_domain.$this->options->{url});
       my $page = App::webcritic::Critic::Site::Page->new($this->site, $link);
-      
       $page->parse;
-      my $text = $page->get_content->get_content;
-      if ($this->is_valid($text)) {
-        my $rules = WWW::RobotRules->new("webcritic/$App::webcritic::VERSION");
-        $rules->parse($link->get_url, $text);
-      }
-      $this->site->add_page($page);
-      $fp->add_link($link);
       
       if ($page->get_code == 200) {
         $this->status ||= 0;
       } else {
         $this->status = 2 if $this->status < 2;
       }
-    }
-  
-  # Method: is_valid
-  #   does robots.txt valid
-  #
-  # Parameters:
-  #   $text - Str - file content
-  #
-  # Returns:
-  #   0|1
-  sub is_valid : Public
-    {
-      my $this = shift;
-      my $text = shift;
-      
-      $text =~ s/\015\012/\012/g;
-      for my $ln (split /[\012\015]/, $text) {
-        next if $ln =~ /^\s*\#/; # comments
-        next if $ln =~ /^\s*$/;  # empty lines
-        next if $ln =~ /^\s*[\w\-]+\s*:\s*\S+\s*$/; # rules
-        
-        $this->status = 2;
-        $this->log_error("Robots.txt isn't valid");
-        return 0;
-      }
-      return 1;
     }
   
 1;

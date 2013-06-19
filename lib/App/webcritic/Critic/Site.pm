@@ -49,7 +49,8 @@ use App::webcritic::Critic::Site::Page::Link;
       my $this = shift;
       for my $policy (@{$this->options->{policies}->{site}}) {
         load $policy->{module};
-        my $p = $policy->{module}->new;
+        my $opts = (exists $policy->{options} ? $policy->{options} : {});
+        my $p = $policy->{module}->new($opts);
         $p->set_name($policy->{name});
         $p->set_site($this);
         $p->inspect;

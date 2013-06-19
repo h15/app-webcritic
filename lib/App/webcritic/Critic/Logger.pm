@@ -12,6 +12,7 @@ use Term::ANSIColor;
     warn  => 40,
     error => 60,
     fatal => 80,
+    off   => 99,
   };
   protected static log_color => {
     debug => 'white',

@@ -6,7 +6,6 @@
 package App::webcritic::Critic::Policy::Site::NotFound;
 use Pony::Object qw/App::webcritic::Critic::Policy::Site::Interface
                     App::webcritic::Critic::Logger/;
-use App::webcritic::Critic::UserAgent::Factory;
 use App::webcritic::Critic::Site::Page;
 use App::webcritic::Critic::Site::Page::Link;
 use Digest::MD5 'md5_hex';
@@ -70,11 +69,11 @@ use Digest::MD5 'md5_hex';
     {
       my $this = shift;
       my $fp = $this->site->get_first_page;
-      my $ua = App::webcritic::Critic::UserAgent::Factory->new->get_ua;
       my $url = md5_hex(rand) . '/' . md5_hex(rand) . '/' . md5_hex(rand);
       my $link = App::webcritic::Critic::Site::Page::Link
         ->new(url => $fp->get_scheme.'://'.$this->site->get_domain."/$url");
       my $page = App::webcritic::Critic::Site::Page->new($this->site, $link);
+      $page->set_log_level('off');
       $page->parse;
       
       if ($page->get_code == 404) {

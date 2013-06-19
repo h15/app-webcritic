@@ -46,7 +46,8 @@ use Module::Load;
       my $this = shift;
       for my $policy (@{$this->site->get_options->{policies}->{page}}) {
         load $policy->{module};
-        my $p = $policy->{module}->new;
+        my $opts = (exists $policy->{options} ? $policy->{options} : {});
+        my $p = $policy->{module}->new($opts);
         $p->set_name($policy->{name});
         $p->set_page($this);
         $p->inspect;
