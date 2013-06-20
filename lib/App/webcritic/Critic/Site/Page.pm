@@ -73,12 +73,12 @@ use Module::Load;
       my $hrtime0 = gettimeofday;
       
       my $ua = App::webcritic::Critic::UserAgent::Factory->new->get_ua($this);
-      my ($code, $content, $a_href_list, $img_src_list,
+      my ($code, $title, $content, $a_href_list, $img_src_list,
           $link_href_list, $script_src_list, $undef_list) = $ua->get_page();
       
       $this->code = $code || 0;
       $this->content = App::webcritic::Critic::Site::Page::Content
-        ->new($code, $content);
+        ->new($code, $title, $content);
       
       $this->add_link_by_url($_, 'a_href')     for @$a_href_list;
       $this->add_link_by_url($_, 'img_src')    for @$img_src_list;

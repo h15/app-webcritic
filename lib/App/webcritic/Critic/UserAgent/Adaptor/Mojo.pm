@@ -32,6 +32,7 @@ use App::webcritic;
   #
   # Returns:
   #   $code - Int - HTTP code
+  #   $title - Str - Page title
   #   $content - Str - Page content
   #   \@a_href_list - ArrayRef - urls from a[href]
   #   \@img_src_list - ArrayRef - urls from img[src]
@@ -48,13 +49,13 @@ use App::webcritic;
       
       if (exists $res->{error} && @{$res->{error}}) {
         $this->log_error("%s:\n\t%s", $this->page->get_url, join "\n\t", @{$res->{error}});
-        return $code, '', [], [], [] ,[], [];
+        return $code, '', '', [], [], [] ,[], [];
       }
       
       # Skip by content-type
       if ($res->content->{headers}->{headers}->{'content-type'}[0][0] !~ /(?:text|html)/) {
         $this->log_debug('%s looks like non-text/html document', $this->page->get_url);
-        return $code, '', [], [], [], [], [];
+        return $code, '', '', [], [], [], [], [];
       }
       
       # text/html/etc
@@ -83,6 +84,7 @@ use App::webcritic;
     {
       my $this = shift;
       my ($res, $code, $content) = @_;
+      my $title = $res->dom('head > title')->pluck('text')->[0] || '';
       
       my (%a_href_list, %img_src_list, %link_href_list,
           %script_src_list, %undef_list);
@@ -142,7 +144,7 @@ use App::webcritic;
         }
       }
       
-      return $code, $content, [keys %a_href_list], [keys %img_src_list],
+      return $code, $title, $content, [keys %a_href_list], [keys %img_src_list],
         [keys %link_href_list], [keys %script_src_list], [keys %undef_list];
     }
   

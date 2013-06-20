@@ -73,8 +73,9 @@ use WWW::RobotRules;
       my $link = App::webcritic::Critic::Site::Page::Link
         ->new(url => $fp->get_scheme.'://'.$this->site->get_domain.'/robots.txt');
       my $page = App::webcritic::Critic::Site::Page->new($this->site, $link);
-      
+      $page->set_log_level('off');
       $page->parse;
+      
       my $text = $page->get_content->get_content;
       if ($this->is_valid($text)) {
         my $rules = WWW::RobotRules->new("webcritic/$App::webcritic::VERSION");

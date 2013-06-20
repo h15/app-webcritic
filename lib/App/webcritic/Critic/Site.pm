@@ -77,6 +77,15 @@ use App::webcritic::Critic::Site::Page::Link;
       return $this->options;
     }
   
+  # Method: get_page_list
+  #
+  # Returns: ArrayRef
+  sub get_page_list : Public
+    {
+      my $this = shift;
+      return $this->page_list;
+    }
+  
   # Method: parse
   #   parse site
   sub parse : Public

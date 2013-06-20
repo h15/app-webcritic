@@ -81,6 +81,7 @@ use App::webcritic;
       my $link = App::webcritic::Critic::Site::Page::Link
         ->new(url => $fp->get_scheme.'://'.$this->site->get_domain.$this->options->{url});
       my $page = App::webcritic::Critic::Site::Page->new($this->site, $link);
+      $page->set_log_level('off');
       $page->parse;
       
       if ($page->get_code == 200) {
