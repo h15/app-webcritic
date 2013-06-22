@@ -1,0 +1,18 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use FindBin;
+use Pony::Object;
+
+BEGIN {
+  $Pony::Object::DEFAULT->{''}->{withExceptions} = 1;
+  unshift @INC, "$FindBin::Bin/../lib";
+}
+
+use App::webcritic::Critic::WebServer::WebUI;
+use App::webcritic::Config;
+
+my $config = App::webcritic::Config->new(@ARGV);
+my $server = App::webcritic::Critic::WebServer::WebUI->new($config);
+$server->run_webui;
