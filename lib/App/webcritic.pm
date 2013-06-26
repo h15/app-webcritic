@@ -1,3 +1,5 @@
+# "That's a calculator. I ate it to gain its power."
+
 package App::webcritic;
 our $VERSION = '0.01';
 1;

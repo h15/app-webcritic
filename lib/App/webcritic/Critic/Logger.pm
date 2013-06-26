@@ -1,3 +1,9 @@
+# Sheldon: I wouldn't tell you the secret. (pause) Shhhhh!!!!
+# Leonard: What secret? Tell me the secret.
+# Sheldon: Mom smokes in the car. Jesus is okay with it, but we can't tell dad.
+# Leonard: Not that secret, the other secret.
+# Sheldon: I'M BATMAN!!!! SHHHH!!!
+
 # Class: App::webcritic::Critic::Logger
 #   Abstract logger
 package App::webcritic::Critic::Logger;

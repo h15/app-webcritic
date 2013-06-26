@@ -73,7 +73,6 @@ use App::webcritic;
       my $ua = Mojo::UserAgent->new;
       $ua->name("webcritic/$App::webcritic::VERSION");
       my $res = $ua->get($this->page->get_url)->res;
-      say dump $res; die;
       return $res;
     }
   

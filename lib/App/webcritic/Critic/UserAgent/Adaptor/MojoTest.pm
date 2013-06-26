@@ -6,8 +6,8 @@
 package App::webcritic::Critic::UserAgent::Adaptor::MojoTest;
 use Pony::Object qw/App::webcritic::Critic::UserAgent::Adaptor::Mojo/;
 use Mojo::Message::Response;
-
-  protected 'pages' => {};
+  
+  protected static 'pages' => {};
   
   # Method: init
   #   Constructor
@@ -19,7 +19,7 @@ use Mojo::Message::Response;
     {
       my $this = shift;
       $this->SUPER::init(shift);
-      $this->pages = shift;
+      $this->pages = shift if @_;
     }
   
   # Method: do_request
