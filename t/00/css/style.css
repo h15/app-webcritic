@@ -1,4 +1,4 @@
-nav, header, article, footer { display: block; }
+nav, header, article, footer { display: block; background: url(../img/bg.png) }
 nav { margin: 20px 0px; width: 100%; }
 nav>ul>li { float: left; list-style: none; margin: 20px; }
 .cb { clear: both; }

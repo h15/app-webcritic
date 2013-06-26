@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use feature ':5.10';
 use Data::Dumper;
-use Test::More tests => 3;
+use Test::More tests => 6;
 
 use App::webcritic::Critic::UserAgent::Adaptor::MojoTest;
 use App::webcritic::Critic::Site::Page::Link;
@@ -29,15 +29,30 @@ my %pages;
 
 # Create fake website
 my $site = App::webcritic::Critic::Site->new('http://webcritic/index.html', 'test', {});
-my $link = App::webcritic::Critic::Site::Page::Link->new(url => 'http://webcritic/index.html');
-my $page = App::webcritic::Critic::Site::Page->new($site, $link);
-my $ua = App::webcritic::Critic::UserAgent::Adaptor::MojoTest->new($page, \%pages); # fake is here
-my ($code, $title, $content, $a_href_list, $img_src_list, $link_href_list,
-    $script_src_list, $undef_list) = $ua->get_page($page);
 
-ok($code == 200, 'Page found');
-ok(grep({$_ eq $site_root.'css/style.css'} @$link_href_list), 'Find stylesheet');
-ok(grep({$_ eq $site_root.'catalog'} @$a_href_list), 'Find href');
+{ # Check simple html file.
+  my $link = App::webcritic::Critic::Site::Page::Link->new(url => 'http://webcritic/index.html');
+  my $page = App::webcritic::Critic::Site::Page->new($site, $link);
+  my $ua = App::webcritic::Critic::UserAgent::Adaptor::MojoTest->new($page, \%pages); # fake is here
+  my ($code, $title, $content, $a_href_list, $img_src_list, $link_href_list,
+      $script_src_list, $undef_list) = $ua->get_page($page);
+  
+  ok($code == 200, 'Page found');
+  ok(grep({$_ eq $site_root.'css/style.css'} @$link_href_list), 'Find stylesheet');
+  ok(grep({$_ eq $site_root.'catalog'} @$a_href_list), 'Find href');
+  ok(!grep({$_ =~ qr#\.\./\.\./#} @$a_href_list), 'Ignore ../.. links');
+}
+
+{ # Check css file
+  my $link = App::webcritic::Critic::Site::Page::Link->new(url => 'http://webcritic/css/style.css');
+  my $page = App::webcritic::Critic::Site::Page->new($site, $link);
+  my $ua = App::webcritic::Critic::UserAgent::Adaptor::MojoTest->new($page, \%pages); # fake is here
+  my ($code, $title, $content, $a_href_list, $img_src_list, $link_href_list,
+      $script_src_list, $undef_list) = $ua->get_page($page);
+  
+  ok($code == 200, 'Stylesheet found');
+  ok(grep({$_ eq $site_root.'img/bg.png'} @$undef_list), 'Find url to pic in stylesheet');
+}
 
 # Function: dir_to_hash
 #   read dir and shows as hash path=>file_content
@@ -57,10 +72,18 @@ sub dir_to_hash {
       %hash = (%hash, dir_to_hash("$f"));
     }
     elsif (-f $f) {
-      open(my $fh, '<utf8', $f) or die "Can't read $f";
-      my $data = <$fh>;
-      close $fh;
-      %hash = (%hash, "$f" => $data);
+      if (-B $f) {
+        open(my $fh, '<', $f) or die "Can't read $f";
+        binmode $fh;
+        my $data = <$fh>;
+        close $fh;
+        %hash = (%hash, "$f" => $data);
+      } else {
+        open(my $fh, '<utf8', $f) or die "Can't read $f";
+        my $data = <$fh>;
+        close $fh;
+        %hash = (%hash, "$f" => $data);
+      }
     }
   }
   return %hash;
