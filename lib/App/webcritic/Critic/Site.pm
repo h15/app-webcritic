@@ -4,7 +4,7 @@
 # Extends:
 #   App::webcritic::Critic::Logger
 package App::webcritic::Critic::Site;
-use Pony::Object qw/App::webcritic::Critic::Logger/;
+use Pony::Object qw/App::webcritic::Critic::Logger :try/;
 use Socket;
 use Module::Load;
 use App::webcritic::Critic::Site::Page;
@@ -35,7 +35,12 @@ use App::webcritic::Critic::Site::Page::Link;
       
       $this->name ||= 'Site ' . $this->url;
       ($this->domain) = ($this->url =~ m/\w+:\/\/([\w\d\-\.:]+)/); # port too
-      $this->host = inet_aton $this->domain;
+      
+      $this->host = try {
+        inet_aton $this->domain;
+      } catch {
+        '0.0.0.0';
+      };
       
       my $link = App::webcritic::Critic::Site::Page::Link->new(url => $this->url);
       $this->first_page = App::webcritic::Critic::Site::Page->new($this, $link);

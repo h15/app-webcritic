@@ -42,9 +42,7 @@ use App::webcritic;
   sub get_page : Public
     {
       my $this = shift;
-      my $ua = Mojo::UserAgent->new;
-      $ua->name("webcritic/$App::webcritic::VERSION");
-      my $res = $ua->get($this->page->get_url)->res;
+      my $res = $this->do_request;
       my $code = $res->{code};
       
       if (exists $res->{error} && @{$res->{error}}) {
@@ -62,6 +60,21 @@ use App::webcritic;
       my $content = $res->content->{asset}->{content} || '';
       
       return $this->parse($res, $code, $content);
+    }
+  
+  # Method: do_request
+  #   request data from remote server
+  #
+  # Returns:
+  #   $res
+  sub do_request : Protected
+    {
+      my $this = shift;
+      my $ua = Mojo::UserAgent->new;
+      $ua->name("webcritic/$App::webcritic::VERSION");
+      my $res = $ua->get($this->page->get_url)->res;
+      say dump $res; die;
+      return $res;
     }
   
   # Method: parse
