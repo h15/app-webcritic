@@ -16,24 +16,26 @@ use App::webcritic::Critic::Site::Page;
 use App::webcritic::Critic::Site;
 
 # Create page list
+my $site_root = 'http://webcritic/';
 my $dir = './t/00';
 my %pages;
 {
   my %tmp = dir_to_hash($dir);
   while (my ($k, $v) = each %tmp) {
     $k = substr $k, 1 + length $dir;
-    $pages{$k} = $v;
+    $pages{$site_root.$k} = $v;
   }
 }
 
-my $site = App::webcritic::Critic::Site->new('http://webcritic/', 'test', {});
-my $link = App::webcritic::Critic::Site::Page::Link->new(url => 'http://webcritic/');
+# Create fake website
+my $site = App::webcritic::Critic::Site->new('http://webcritic/index.html', 'test', {});
+my $link = App::webcritic::Critic::Site::Page::Link->new(url => 'http://webcritic/index.html');
 my $page = App::webcritic::Critic::Site::Page->new($site, $link);
 my $ua = App::webcritic::Critic::UserAgent::Adaptor::MojoTest->new($page, \%pages);
 my ($code, $title, $content, $a_href_list, $img_src_list, $link_href_list,
     $script_src_list, $undef_list) = $ua->get_page($page);
 
-say Dumper $content; die;
+ok($code == 200, 'Page found');
 
 # Function: dir_to_hash
 #   read dir and shows as hash path=>file_content

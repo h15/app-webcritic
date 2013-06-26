@@ -23,8 +23,6 @@ my %pages;
 my $tester = App::webcritic::Critic::WebServer::Test->new(\%pages);
 $tester->run_server;
 
-
-
 # Function: dir_to_hash
 #   read dir and shows as hash path=>file_content
 #

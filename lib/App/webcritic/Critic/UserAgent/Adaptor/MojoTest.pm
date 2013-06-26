@@ -5,7 +5,8 @@
 #   App::webcritic::Critic::UserAgent::Adaptor::Mojo
 package App::webcritic::Critic::UserAgent::Adaptor::MojoTest;
 use Pony::Object qw/App::webcritic::Critic::UserAgent::Adaptor::Mojo/;
-  
+use Mojo::Message::Response;
+
   protected 'pages' => {};
   
   # Method: init
@@ -45,11 +46,10 @@ use Pony::Object qw/App::webcritic::Critic::UserAgent::Adaptor::Mojo/;
     {
       my $this = shift;
       my ($code, $content) = @_;
-      my $res = Mojo::UserAgent->new->get->res;
-      $res->{code} = $code;
-      $res->{content}->{asset}->{content} = $content;
-      $res->{finished} = 2;
-      #say dump $res;die;
+      my $res = Mojo::Message::Response->new;
+      $res->code($code);
+      $res->headers->content_type('text/plain');
+      $res->body($content);
       return $res;
     }
   
