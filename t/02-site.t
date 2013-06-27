@@ -36,5 +36,5 @@ App::webcritic::Critic::UserAgent::Factory->new
 { # Parse fake website
   my $site = App::webcritic::Critic::Site->new('http://webcritic/index.html', 'test', {});
   $site->parse();
-  $site->check_policies();
+  #$site->check_policies();
 }
