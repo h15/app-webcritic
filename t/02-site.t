@@ -9,7 +9,7 @@ use warnings;
 use feature ':5.10';
 use Data::Dumper;
 use My::Util qw(dir_to_hash);
-use Test::More tests => 6;
+use Test::More tests => 10;
 
 use App::webcritic::Critic::UserAgent::Adaptor::MojoTest;
 use App::webcritic::Critic::UserAgent::Factory;
