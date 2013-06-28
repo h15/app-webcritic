@@ -29,6 +29,7 @@ use Module::Load;
     {
       my $this = shift;
       $this->default_ua_adaptor = shift;
+      return $this;
     }
   
   # Method: get_ua

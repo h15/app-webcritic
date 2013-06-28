@@ -31,10 +31,24 @@ my %pages;
 App::webcritic::Critic::UserAgent::Adaptor::MojoTest->new(undef, \%pages);
 # Define default UA
 App::webcritic::Critic::UserAgent::Factory->new
-  ->set_default_ua('App::webcritic::Critic::UserAgent::Adaptor::MojoTest');
+  ->set_default_ua('App::webcritic::Critic::UserAgent::Adaptor::MojoTest')
+    ->init;
 
 { # Parse fake website
   my $site = App::webcritic::Critic::Site->new('http://webcritic/index.html', 'test', {});
+  $site->set_log_level('off');
   $site->parse();
-  #$site->check_policies();
+  # Walk the website
+  ok($site->get_first_page->get_code == 200, 'First page looks 200');
+  ok($site->get_first_page->get_url eq $site_root.'index.html', 'First page has right url');
+  # link list
+  ok(grep({$_->get_url eq $site_root} @{$site->get_first_page->get_link_list}), 'link list 1');
+  ok(grep({$_->get_url eq $site_root.'about'} @{$site->get_first_page->get_link_list}), 'link list 2');
+  ok(grep({$_->get_url eq $site_root.'catalog'} @{$site->get_first_page->get_link_list}), 'link list 3');
+  ok(grep({$_->get_url eq $site_root.'css/style.css'} @{$site->get_first_page->get_link_list}), 'link list 4');
+  # page list
+  ok(grep({$_->get_url eq $site_root} @{$site->get_page_list}), 'page list 1');
+  ok(grep({$_->get_url eq $site_root && $_->get_code == 404} @{$site->get_page_list}), '/ not found');
+  ok(grep({$_->get_url eq $site_root.'css/style.css' && $_->get_code == 200} @{$site->get_page_list}), 'page list 2');
+  ok(grep({$_->get_url eq $site_root.'img/bg.png' && $_->get_code == 200} @{$site->get_page_list}), 'page list 3');
 }

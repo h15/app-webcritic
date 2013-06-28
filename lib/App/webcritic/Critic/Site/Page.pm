@@ -34,9 +34,7 @@ use Module::Load;
       ($this->site, $this->link) = @_;
       $this->url = $this->link->get_url;
       ($this->scheme) = ($this->url =~ /^(\w+):\/\//);
-      
-      $this->set_log_level($this->site->get_options->{log_level})
-        if exists $this->site->get_options->{log_level};
+      $this->set_log_level($this->site->get_log_level);
     }
   
   # Method: check_policies

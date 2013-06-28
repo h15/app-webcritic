@@ -71,6 +71,21 @@ use App::webcritic::Critic::Site::Page::Link;
       }
     }
   
+  # Methed: set_log_level
+  #   overrides Logger's method to set log level for pages
+  #
+  # Parameters:
+  #   $new_level - Str - See $this->log_level_list
+  sub set_log_level : Public
+    {
+      my $this = shift;
+      $this->SUPER::set_log_level(@_);
+      
+      for my $p (@{$this->page_list}) {
+        $p->set_log_level($this->get_log_level);
+      }
+    }
+  
   # Method: get_options
   #   getter for options
   #
@@ -97,7 +112,7 @@ use App::webcritic::Critic::Site::Page::Link;
     {
       my $this = shift;
       $this->log_info('Start parse "'.$this->name.'"');
-      my @pool = @{clone $this->page_list};
+      my @pool = @{$this->page_list};
       
       while (my $page = pop @pool) {
         $page->parse();
