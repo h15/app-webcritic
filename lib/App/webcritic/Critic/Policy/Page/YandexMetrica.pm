@@ -2,10 +2,10 @@
 #   Site's policy: does site uses YandexMetrica.
 # Extends:
 #   App::webcritic::Critic::Policy::Site::Interface
-#   App::webcritic::Critic::Logger
+#   App::webcritic::Critic::Log::AbstractLogger
 package App::webcritic::Critic::Policy::Page::YandexMetrica;
 use Pony::Object qw/App::webcritic::Critic::Policy::Page::Interface
-                    App::webcritic::Critic::Logger/;
+                    App::webcritic::Critic::Log::AbstractLogger/;
   
   protected 'name';
   protected 'page';

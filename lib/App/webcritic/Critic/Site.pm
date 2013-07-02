@@ -2,9 +2,9 @@
 #   Regular web site.
 #
 # Extends:
-#   App::webcritic::Critic::Logger
+#   App::webcritic::Critic::Log::AbstractLogger
 package App::webcritic::Critic::Site;
-use Pony::Object qw/App::webcritic::Critic::Logger :try/;
+use Pony::Object qw/App::webcritic::Critic::Log::AbstractLogger :try/;
 use Socket;
 use Module::Load;
 use App::webcritic::Critic::Site::Page;

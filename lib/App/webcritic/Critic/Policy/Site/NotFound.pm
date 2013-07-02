@@ -2,10 +2,10 @@
 #   Site's policy: does page returns 404.
 # Extends:
 #   App::webcritic::Critic::Policy::Site::Interface
-#   App::webcritic::Critic::Logger
+#   App::webcritic::Critic::Log::AbstractLogger
 package App::webcritic::Critic::Policy::Site::NotFound;
 use Pony::Object qw/App::webcritic::Critic::Policy::Site::Interface
-                    App::webcritic::Critic::Logger/;
+                    App::webcritic::Critic::Log::AbstractLogger/;
 use App::webcritic::Critic::Site::Page;
 use App::webcritic::Critic::Site::Page::Link;
 use Digest::MD5 'md5_hex';

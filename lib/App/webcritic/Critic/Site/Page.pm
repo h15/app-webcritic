@@ -2,9 +2,9 @@
 #   Site's page
 #
 # Extends:
-#   App::webcritic::Critic::Logger
+#   App::webcritic::Critic::Log::AbstractLogger
 package App::webcritic::Critic::Site::Page;
-use Pony::Object qw/App::webcritic::Critic::Logger/;
+use Pony::Object qw/App::webcritic::Critic::Log::AbstractLogger/;
 use App::webcritic::Critic::UserAgent::Factory;
 use App::webcritic::Critic::Site::Page::Content;
 use Time::HiRes qw/gettimeofday/;

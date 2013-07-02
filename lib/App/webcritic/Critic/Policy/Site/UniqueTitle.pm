@@ -2,10 +2,10 @@
 #   Site's policy: does all titles are uniq.
 # Extends:
 #   App::webcritic::Critic::Policy::Site::Interface
-#   App::webcritic::Critic::Logger
+#   App::webcritic::Critic::Log::AbstractLogger
 package App::webcritic::Critic::Policy::Site::UniqueTitle;
 use Pony::Object qw/App::webcritic::Critic::Policy::Site::Interface
-                    App::webcritic::Critic::Logger/;
+                    App::webcritic::Critic::Log::AbstractLogger/;
 use App::webcritic::Critic::Site::Page;
 use App::webcritic::Critic::Site::Page::Link;
   

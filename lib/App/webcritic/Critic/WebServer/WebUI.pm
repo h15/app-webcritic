@@ -1,6 +1,6 @@
 package App::webcritic::Critic::WebServer::WebUI;
 use Mojolicious::Lite;
-use Pony::Object qw/App::webcritic::Critic::Logger/;
+use Pony::Object qw/App::webcritic::Critic::Log::AbstractLogger/;
 use Mojo::IOLoop;
 use Mojo::Server::Daemon;
   

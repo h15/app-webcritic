@@ -3,9 +3,9 @@
 #   Singleton.
 #
 # Extends:
-#   App::webcritic::Critic::Logger
+#   App::webcritic::Critic::Log::AbstractLogger
 package App::webcritic::Critic;
-use Pony::Object -singleton => qw/App::webcritic::Critic::Logger/;
+use Pony::Object -singleton => qw/App::webcritic::Critic::Log::AbstractLogger/;
 use App::webcritic::Critic::Site;
   
   protected 'config';

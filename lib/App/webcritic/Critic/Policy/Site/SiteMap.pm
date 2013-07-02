@@ -2,10 +2,10 @@
 #   Site's policy: does sitemap.xml exist and valid.
 # Extends:
 #   App::webcritic::Critic::Policy::Site::Interface
-#   App::webcritic::Critic::Logger
+#   App::webcritic::Critic::Log::AbstractLogger
 package App::webcritic::Critic::Policy::Site::SiteMap;
 use Pony::Object qw/App::webcritic::Critic::Policy::Site::Interface
-                    App::webcritic::Critic::Logger/;
+                    App::webcritic::Critic::Log::AbstractLogger/;
 use Pony::Object::Throwable;
 use App::webcritic::Critic::Site::Page;
 use App::webcritic::Critic::Site::Page::Link;

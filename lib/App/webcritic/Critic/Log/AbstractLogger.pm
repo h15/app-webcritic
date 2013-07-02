@@ -4,12 +4,13 @@
 # Leonard: Not that secret, the other secret.
 # Sheldon: I'M BATMAN!!!! SHHHH!!!
 
-# Class: App::webcritic::Critic::Logger
+# Class: App::webcritic::Critic::Log::AbstractLogger
 #   Abstract logger
-package App::webcritic::Critic::Logger;
+package App::webcritic::Critic::Log::AbstractLogger;
 use Pony::Object -abstract;
 use Pony::Object::Throwable;
-use Term::ANSIColor;
+use App::webcritic::Critic::Log::Message;
+use App::webcritic::Critic::Log::Factory;
   
   protected log_level => 0;
   protected static log_level_list => {
@@ -20,13 +21,7 @@ use Term::ANSIColor;
     fatal => 80,
     off   => 99,
   };
-  protected static log_color => {
-    debug => 'white',
-    info  => 'bright_white',
-    warn  => 'cyan',
-    error => 'yellow',
-    fatal => 'red',
-  };
+  protected static 'log_adaptor';
   
   # Method: set_log_level
   #   setter for log_level
@@ -71,12 +66,13 @@ use Term::ANSIColor;
       my $this = shift;
       my ($level, @content) = @_;
       my $content = shift @content;
-      $content = sprintf $content, @content if @content;
       
-      my $res = *STDOUT;
-      print color $this->log_color->{$level};
-      printf $res "[%5s] %s\n", $level, $content;
-      print color 'reset';
+      my $message = @content ?
+        App::webcritic::Critic::Log::Message->new($level, $content, \@content):
+        App::webcritic::Critic::Log::Message->new($level, $content, []);
+      
+      $this->log_adaptor ||= App::webcritic::Critic::Log::Factory->new->get_log();
+      $this->log_adaptor->add_message($message);
     }
   
   # Method: log_debug

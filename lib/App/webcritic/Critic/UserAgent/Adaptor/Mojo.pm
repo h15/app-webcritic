@@ -5,7 +5,7 @@
 #   App::webcritic::Critic::UserAgent::Interface
 package App::webcritic::Critic::UserAgent::Adaptor::Mojo;
 use Pony::Object qw/App::webcritic::Critic::UserAgent::Interface
-                    App::webcritic::Critic::Logger/;
+                    App::webcritic::Critic::Log::AbstractLogger/;
 use Mojo::UserAgent;
 use App::webcritic;
   
