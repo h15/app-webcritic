@@ -1,17 +1,30 @@
+# Class: App::webcritic::Critic::WebServer::WebUI
+#   Web user interface.
+# Implements:
+#   App::webcritic::Critic::Log::AbstractLogger
 package App::webcritic::Critic::WebServer::WebUI;
 use Mojolicious::Lite;
-use Pony::Object qw/App::webcritic::Critic::Log::AbstractLogger/;
+use Pony::Object qw/:try App::webcritic::Critic::Log::AbstractLogger/;
 use Mojo::IOLoop;
 use Mojo::Server::Daemon;
+use Pony::Object::Throwable;
   
   protected 'config';
   
+  # Method: init
+  #   Constructor
+  #
+  # Parameters:
+  #   $this->config - HashRef
   sub init : Public
     {
       my $this = shift;
       $this->config = shift;
     }
   
+  # Method: run_webui
+  #   Web server starter.
+  #   Simple Mojolicious::Lite server.
   sub run_webui : Public
     {
       my $this = shift;
@@ -24,10 +37,48 @@ use Mojo::Server::Daemon;
       
       get '/config' => sub {
         my $self = shift;
+        my $list = $this->get_config_list('./config/local');
         
+        my $conf = try {
+          if ($self->session('config_name')) {
+            open(my $fh, $self->session('config_name'))
+              or throw Pony::Object::Throwable("Can't find config file ".$self->session('config_name'));
+            local $/;
+            my $data = <$fh>;
+            close $fh;
+            return $data;
+          }
+          return {};
+        };
+        
+        return $self->stash(list => $list, conf => $conf)->render('config');
       };
       
       Mojo::Server::Daemon->new(app => app, listen => ["http://*:7357"])->run;
+    }
+  
+  # Method: get_config_list
+  #   Get config list
+  #
+  # Parameters:
+  #   $path - Str - path to directory with configs
+  #
+  # Returns:
+  #   \@list - ArrayRef - list of config files
+  sub get_config_list : Public
+    {
+      my $this = shift;
+      my $path = shift;
+      my @list;
+      
+      for my $file (<$path/*>) {
+        next unless -f $file;
+        next if $file =~ /^\./;
+        next if $file !~ /\.json$/;
+        push @list, $file;
+      }
+      
+      return \@list;
     }
   
 1;
