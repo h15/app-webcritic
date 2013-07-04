@@ -16,6 +16,7 @@ use App::webcritic::Critic::Site::Page::Link;
   protected 'host';
   protected 'first_page';
   protected 'page_list' => [];
+  protected 'page_by_url' => {};
   # Make 'exist_page' faster.
   protected 'exist_page_list' => {};
   protected 'options';
@@ -176,6 +177,22 @@ use App::webcritic::Critic::Site::Page::Link;
       my $page = shift;
       push @{$this->page_list}, $page;
       $this->exist_page_list->{$page->get_url} = 1;
+      $this->page_by_url->{$page->get_url} = $page;
+    }
+  
+  # Method: get_page_by_url
+  #   get page by url
+  #
+  # Parameters:
+  #   $url - Str
+  #
+  # Returns:
+  #   App::webcritic::Critic::Site::Page
+  sub get_page_by_url : Public
+    {
+      my $this = shift;
+      my $url = shift;
+      return $this->page_by_url->{$url};
     }
   
   # Method: get_url
