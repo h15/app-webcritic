@@ -1,3 +1,4 @@
 *.komodoproject
 .komodotools
 test_config.json
+structure.html

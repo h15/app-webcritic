@@ -21,6 +21,7 @@ use Module::Load;
   protected 'last_modify';
   protected 'link_list' => [];
   protected 'level';
+  protected 'parent';
   
   # Method: init
   #   Constructor
