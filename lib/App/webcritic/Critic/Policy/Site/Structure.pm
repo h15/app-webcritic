@@ -103,7 +103,7 @@ use Encode;
       my $tree = {
         url => $this->site->get_first_page->get_url,
         title => $this->site->get_first_page->get_content->get_title,
-        childs => $this->get_tree($this->site->get_first_page)
+        childs => $this->get_tree($this->site->get_first_page, 1)
       };
       
       # Render if demained
@@ -113,6 +113,11 @@ use Encode;
       
     }
   
+  # Method: render
+  #   render site tree
+  #
+  # Parameters:
+  #   $tree - HashRef
   sub render : Public
     {
       my $this = shift;
@@ -126,9 +131,16 @@ use Encode;
       }
       
       close $fh;
-      
     }
   
+  # Method: render_html
+  #   render site tree as html file
+  #
+  # Parameters:
+  #   $tree - HashRef
+  #
+  # Returns:
+  #   Str
   sub render_html : Public
     {
       my $this = shift;
@@ -169,38 +181,39 @@ use Encode;
   # Method: get_tree
   #   get tree
   #
-  # Deprecated
-  #
   # Parameters:
   #   $page - App::webcritic::Critic::Site::Page
+  #   $depth - Int - iteration depth (1 - BFS, 100000000000000000 - DFS)
   #
   # Returns:
   #   ArrayRef
   sub get_tree : Public
     {
       my $this = shift;
-      my $root_page = shift;
+      my ($root_page, $depth) = @_;
       my @pages;
       
       # Create child list
       for my $url (@{ $this->childs_by_url->{$root_page->get_url} }) {
-        next if $this->indexed->{$url};
         my $page = $this->site->get_page_by_url($url);
+        
+        next if $this->indexed->{$url};
         next if not defined $page;
         next if not defined $page->get_content;
         next if $page->get_content->get_content eq '';
+        
         $this->indexed->{$url}++;
         
         push @pages, {
           title => $page->get_content->get_title,
           url => $page->get_url,
-          childs => sub { $this->get_tree($page) }
+          childs => sub { $this->get_tree($page, @_) }
         };
       }
       
       # Looking for childs' childs
       for my $page (@pages) {
-        $page->{childs} = $page->{childs}->();
+        $page->{childs} = $depth > 0 ? $page->{childs}->($depth - 1) : [];
       }
       
       return \@pages;
