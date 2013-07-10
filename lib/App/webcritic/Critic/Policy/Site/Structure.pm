@@ -16,6 +16,7 @@ use Encode;
   protected 'options';
   protected 'indexed' => {};
   protected 'childs_by_url' => {};
+  protected 'queue' => [];
   
   # Var: status
   # | Inspect status.
@@ -106,7 +107,7 @@ use Encode;
         childs => $this->get_tree($this->site->get_first_page, 1)
       };
       
-      # Render if demained
+      # Render if required
       if (exists $this->options->{output} && exists $this->options->{format}) {
         $this->render($tree);
       }

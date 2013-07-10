@@ -16,10 +16,32 @@
             {
               "name": "Not Found 404",
               "module": "App::webcritic::Critic::Policy::Site::NotFound"
+            },
+            {
+              "name": "Uniq title",
+              "module": "App::webcritic::Critic::Policy::Site::UniqueTitle"
+            },
+            {
+              "name": "Structure",
+              "module": "App::webcritic::Critic::Policy::Site::Structure",
+              "options": {
+                "output": "./structure.html",
+                "format": "html"
+              }
+            },
+            {
+              "name": "SiteMap.xml",
+              "module": "App::webcritic::Critic::Policy::Site::SiteMap",
+              "options": {
+                "url": "/sitemap.xml"
+              }
             }
           ],
           "page": [
-            
+            {
+              "name": "Yandex.Metrica",
+              "module": "App::webcritic::Critic::Policy::Page::YandexMetrica"
+            }
           ]
         }
       }

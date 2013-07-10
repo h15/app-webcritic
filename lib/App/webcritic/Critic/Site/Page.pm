@@ -20,7 +20,7 @@ use Module::Load;
   protected 'time';
   protected 'last_modify';
   protected 'link_list' => [];
-  protected 'level';
+  protected 'level' => 0;
   protected 'parent';
   
   # Method: init
@@ -29,10 +29,11 @@ use Module::Load;
   # Parameters:
   #   $this->site - App::webcritic::Critic::Site
   #   $this->link - App::webcritic::Critic::Site::Page::Link
+  #   $this->level - Int
   sub init : Public
     {
       my $this = shift;
-      ($this->site, $this->link) = @_;
+      ($this->site, $this->link, $this->level) = @_;
       $this->url = $this->link->get_url;
       ($this->scheme) = ($this->url =~ /^(\w+):\/\//);
       $this->set_log_level($this->site->get_log_level);
@@ -214,6 +215,15 @@ use Module::Load;
       return $this->time;
     }
   
+  # Method: get_level
+  #
+  # Returns:
+  #   Int
+  sub get_level : Public
+    {
+      my $this = shift;
+      return $this->level;
+    }
 1;
 
 __END__

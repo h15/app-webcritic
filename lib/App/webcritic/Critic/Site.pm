@@ -44,7 +44,7 @@ use App::webcritic::Critic::Site::Page::Link;
       };
       
       my $link = App::webcritic::Critic::Site::Page::Link->new(url => $this->url);
-      $this->first_page = App::webcritic::Critic::Site::Page->new($this, $link);
+      $this->first_page = App::webcritic::Critic::Site::Page->new($this, $link, 1);
       $this->add_page($this->first_page);
     }
   
@@ -116,16 +116,25 @@ use App::webcritic::Critic::Site::Page::Link;
       my @pool = @{$this->page_list};
       
       while (my $page = pop @pool) {
-        $page->parse();
-        sleep($this->options->{sleep} || 0);
-        for my $link (@{$page->get_link_list}) {
-          my $new_page = App::webcritic::Critic::Site::Page->new($this, $link);
-          next if $this->exist_page($new_page);
-          next if $this->is_excluded($new_page);
-          $this->add_page($new_page);
-          unshift @pool, $new_page;
-          $new_page->check_policies();
-        }
+        try {
+          $page->parse();
+          sleep($this->options->{sleep} || 0);
+          
+          for my $link (@{$page->get_link_list}) {
+            my $new_page = App::webcritic::Critic::Site::Page->new($this, $link, $page->get_level + 1);
+            
+            next if $this->exist_page($new_page);
+            next if $this->is_excluded($new_page);
+            next if exists $this->options->{level_limit} && $this->options->{level_limit} < $new_page->get_level;
+            
+            $this->add_page($new_page);
+            unshift @pool, $new_page;
+            
+            $new_page->check_policies();
+          }
+        } catch {
+          say $@;
+        };
       }
       
       $this->log_info('"'.$this->name.'" parsed');

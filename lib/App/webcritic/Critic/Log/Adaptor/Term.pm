@@ -22,14 +22,16 @@ use Term::ANSIColor;
       my $this = shift;
       my $res = *STDOUT;
       
-      for my $msg (@{$this->message_list}) {
-        my $content = @{$msg->get_params} ?
-          sprintf $msg->get_format, @{$msg->get_params} :
-          sprintf $msg->get_format;
-        print color $this->log_color->{$msg->get_level};
-        printf $res "[%5s] %s\n", $msg->get_level, $content;
-        print color 'reset';
-      }
+      try { # don't fail
+        for my $msg (@{$this->message_list}) {
+          my $content = @{$msg->get_params} ?
+            sprintf $msg->get_format, @{$msg->get_params} :
+            sprintf $msg->get_format;
+          print color $this->log_color->{$msg->get_level};
+          printf $res "[%5s] %s\n", $msg->get_level, $content;
+          print color 'reset';
+        }
+      };
     }
   
   # Method: add_message

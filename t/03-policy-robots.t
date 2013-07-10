@@ -3,6 +3,8 @@
 use lib './lib';
 use lib './t';
 
+BEGIN { $Pony::Object::DEFAULT->{''}->{withExceptions} = 1 }
+
 use utf8;
 use strict;
 use warnings;

@@ -1,7 +1,6 @@
 #! /usr/bin/perl
 
-use lib './lib';
-use lib './t';
+use lib './lib', './t', '../lib', '../t';
 
 use utf8;
 use strict;
@@ -10,6 +9,9 @@ use feature ':5.10';
 use Data::Dumper;
 use My::Util qw(dir_to_hash);
 use Test::More tests => 10;
+
+use Pony::Object ':noobject';
+BEGIN { $Pony::Object::DEFAULT->{''}->{withExceptions} = 1 }
 
 use App::webcritic::Critic::UserAgent::Adaptor::MojoTest;
 use App::webcritic::Critic::UserAgent::Factory;
