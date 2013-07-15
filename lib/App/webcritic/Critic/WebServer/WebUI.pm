@@ -4,6 +4,7 @@
 #   App::webcritic::Critic::Log::AbstractLogger
 package App::webcritic::Critic::WebServer::WebUI;
 use File::Spec::Functions 'catdir';
+use JSON::XS;
 use Mojolicious::Lite;
 use Pony::Object qw/:try App::webcritic::Critic::Log::AbstractLogger/;
 use Mojo::IOLoop;
@@ -49,15 +50,20 @@ use Pony::Object::Throwable;
             local $/;
             my $data = <$fh>;
             close $fh;
-            return $data;
+            return decode_json($data);
           }
           return {};
         };
-        
-        return $self->stash(list => $list, conf => $conf)->render('config');
+        my $files = $this->get_config_list('./conf/local');
+        return $self->stash(list => $list, conf => $conf, files => $files)->render('config');
       };
       
-      get '/css/bootstrap.min.css' => sub { shift->render('css/bootstrap.min.css'); };
+      post '/config' => sub {
+        my $self = shift;
+        my $file = $self->param('file');
+        $self->session('config_name' => $file);
+        $self->redirect_to('/config');
+      };
       
       Mojo::Server::Daemon->new(app => app, listen => ["http://*:7357"])->run;
     }
@@ -78,7 +84,7 @@ use Pony::Object::Throwable;
       
       for my $file (<$path/*>) {
         next unless -f $file;
-        next if $file =~ /^\./;
+        next if $file =~ /\/\..*?$/;
         next if $file !~ /\.json$/;
         push @list, $file;
       }
@@ -101,12 +107,15 @@ __DATA__
     <script src="/js/bootstrap.min.js"></script>
     <title><%= title %> - WebCritic/<%= $App::WebCritic::VERSION %></title>
     <style>
+      body { width: 100%; }
       h1.top { float: left; }
       nav.top { float: right; }
       .cb { clear: both; }
       .left { float: left; }
       .right { float: right; }
-      .center { margin: 0 auto; }
+      .center { margin: 0px auto; }
+      article.top { min-height: 600px; width: 800px; margin: 100px auto; }
+      .powered { text-align: center; }
     </style>
   </head>
   <body>
@@ -127,10 +136,13 @@ __DATA__
         </div>
       </div>
     </div>
-    <article>
-      <%= content %>
+    <article class="top">
+      <div class="container span12 center">
+        <%= content %>
+      </div>
     </article>
-    <div class="powered">Powered by <a href="http://github.com/h15/app-webcritic">WebCritic</a> /
+    <div class="powered">Powered by
+      <a href="http://github.com/h15/app-webcritic">WebCritic</a> /
       <a href="http://mojolicio.us">Mojolicious</a> /
       <a href="http://perl.org">Perl</a>
     </div>
@@ -140,3 +152,22 @@ __DATA__
 
 @@ index.html.ep
 % layout 'default', title => "WebCritic";
+
+
+@@ config.html.ep
+% layout 'default', title => "Config";
+% unless (%$conf) {
+<form method="post" action="/config">
+  <label>Select your config
+    <select name="file">
+    % for my $fl (@$files) {
+      <option value="<%= $fl %>"><%= $fl %></option>
+    % }
+    </select>
+  </label>
+  <input type="submit" class="btn btn-submit" value="Select">
+</form>
+% } else {
+Config:
+<textarea name=config><%= dumper $conf %></textarea>
+% }
