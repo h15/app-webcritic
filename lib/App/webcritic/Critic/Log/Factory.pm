@@ -7,6 +7,7 @@ use Module::Load;
   
   protected 'default_log_adaptor' => 'App::webcritic::Critic::Log::Adaptor::Term';
   protected 'log_adaptor';
+  protected 'log_adaptor_options' => {};
   
   # Method: init
   #   Constructor
@@ -24,10 +25,28 @@ use Module::Load;
   #
   # Parameters:
   #   $this->default_log_adaptor - Str - package of adaptor
+  #
+  # Returns:
+  #   App::webcritic::Critic::Log::Factory
   sub set_default_log : Public
     {
       my $this = shift;
       $this->default_log_adaptor = shift;
+      return $this;
+    }
+  
+  # Method: set_log_adaptor_options
+  #   setter for log_adaptor_options
+  #
+  # Parameters:
+  #   $this->log_adaptor_options - HashRef
+  #
+  # Returns:
+  #   App::webcritic::Critic::Log::Factory
+  sub set_log_adaptor_options : Public
+    {
+      my $this = shift;
+      $this->log_adaptor_options = shift;
       return $this;
     }
   
@@ -43,7 +62,8 @@ use Module::Load;
     {
       my $this = shift;
       load $this->log_adaptor;
-      return $this->log_adaptor->new(@_);
+      my %params = (%{ $this->log_adaptor_options }, @_);
+      return $this->log_adaptor->new(%params);
     }
   
 1;

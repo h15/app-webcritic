@@ -32,7 +32,26 @@ use App::webcritic::Critic::Site::Page::Link;
     {
       my $this = shift;
       ($this->url, $this->name, $this->options) = @_;
-      $this->set_log_level($this->options->{log_level}) if exists $this->options->{log_level};
+      
+      # Define log
+      if (exists $this->options->{log}) {
+        # Level
+        $this->set_log_level($this->options->{log}->{level})
+          if exists $this->options->{log}->{level};
+        # Adaptor
+        App::webcritic::Critic::Log::Factory->new
+          ->set_default_log($this->options->{log}->{adaptor})->init
+            if exists $this->options->{log}->{adaptor};
+        # Options
+        App::webcritic::Critic::Log::Factory->new
+          ->set_log_adaptor_options($this->options->{log}->{options})
+            if exists $this->options->{log}->{options};
+        
+        App::webcritic::Critic::Log::Factory->init;
+        $this->set_log_adaptor(
+          App::webcritic::Critic::Log::Factory->new->get_log()
+        );
+      }
       
       $this->name ||= 'Site ' . $this->url;
       ($this->domain) = ($this->url =~ m/\w+:\/\/([\w\d\-\.:]+)/); # port too
@@ -125,7 +144,8 @@ use App::webcritic::Critic::Site::Page::Link;
             
             next if $this->exist_page($new_page);
             next if $this->is_excluded($new_page);
-            next if exists $this->options->{level_limit} && $this->options->{level_limit} < $new_page->get_level;
+            next if exists $this->options->{level_limit}
+              && $this->options->{level_limit} < $new_page->get_level;
             
             $this->add_page($new_page);
             unshift @pool, $new_page;

@@ -37,6 +37,7 @@ use Module::Load;
       $this->url = $this->link->get_url;
       ($this->scheme) = ($this->url =~ /^(\w+):\/\//);
       $this->set_log_level($this->site->get_log_level);
+      $this->set_log_adaptor($this->site->get_log_adaptor);
     }
   
   # Method: check_policies

@@ -23,6 +23,19 @@ use App::webcritic::Critic::Log::Factory;
   };
   protected static 'log_adaptor';
   
+  sub set_log_adaptor : Public
+    {
+      my $this = shift;
+      $this->log_adaptor = shift;
+      return $this;
+    }
+  
+  sub get_log_adaptor : Public
+    {
+      my $this = shift;
+      return $this->log_adaptor;
+    }
+  
   # Method: set_log_level
   #   setter for log_level
   #

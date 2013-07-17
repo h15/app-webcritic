@@ -1,0 +1,40 @@
+{
+  "site_list": [
+    {
+      "url": "http://127.0.0.1:3000",
+      "name": "Test site",
+      "options": {
+        "log": {
+          "level": "debug",
+          "adaptor": "App::webcritic::Critic::Log::Adaptor::SimpleTerm",
+          "options": {
+            "path": "./log/local"
+          }
+        },
+        "sleep": 2,
+        "exclude": ["/pic/captcha/"],
+        "policies": {
+          "site": [
+            {
+              "name": "robots.txt",
+              "module": "App::webcritic::Critic::Policy::Site::RobotsTxt"
+            },
+            {
+              "name": "Not Found 404",
+              "module": "App::webcritic::Critic::Policy::Site::NotFound"
+            }
+          ],
+          "page": [
+            
+          ]
+        }
+      }
+    }
+  ],
+  "global": {
+    "options": {
+      "log_level": "warn",
+      "sleep": 1
+    }
+  }
+}

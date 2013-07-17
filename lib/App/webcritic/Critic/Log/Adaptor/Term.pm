@@ -14,6 +14,7 @@ use Term::ANSIColor;
     error => 'yellow',
     fatal => 'red',
   };
+  protected 'path';
   
   # Method: render
   #   Render/store/etc message_list.
