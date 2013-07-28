@@ -70,6 +70,23 @@ use Pony::Object::Throwable;
         $self->render('config/new_form');
       };
       
+      post '/config/new' => sub {
+        my $self = shift;
+        my ($name, $ident, $url) = ($self->param('name'), $self->param('identifier'), $self->param('url'));
+        die qq{File "./conf/local/$ident.json" already exists} if -f "./conf/local/$ident.json";
+        open(my $fh, ">>", "./conf/local/$ident.json") or die "Can't create file ./conf/local/$ident.json";
+        say $fh encode_json({
+          "site_list" => [
+            {
+              "url" => $url,
+              "name" => $name,
+            }
+          ]
+        });
+        close $fh;
+        $self->redirect_to('/config');
+      };
+      
       Mojo::Server::Daemon->new(app => app, listen => ["http://*:7357"])->run;
     }
   
@@ -102,15 +119,16 @@ use Pony::Object::Throwable;
 __DATA__
 
 @@ layouts/default.html.ep
+% use App::webcritic;
 <!doctype html>
 <html>
   <head>
     <meta charset="utf-8" />
     <link href="/css/bootstrap.min.css" media="screen" rel="stylesheet" />
-    <meta name="generator" content="WebCritic/<%= $App::WebCritic::VERSION %>">
+    <meta name="generator" content="WebCritic/<%= $App::webcritic::VERSION %>">
     <script src="/js/jquery.min.js"></script>
     <script src="/js/bootstrap.min.js"></script>
-    <title><%= title %> - WebCritic/<%= $App::WebCritic::VERSION %></title>
+    <title><%= title %> - WebCritic/<%= $App::webcritic::VERSION %></title>
     <style>
       body { width: 100%; }
       h1.top { float: left; }
@@ -121,13 +139,25 @@ __DATA__
       .center { margin: 0px auto; }
       article.top { min-height: 600px; width: 800px; margin: 100px auto; }
       .powered { text-align: center; }
+      body > .navbar .brand {
+        padding-right: 0;
+        padding-left: 0;
+        margin-left: 20px;
+        float: right;
+        font-weight: bold;
+        color: black;
+        text-shadow: 0 1px 0 rgba(255, 255, 255, .1), 0 0 30px rgba(255, 255, 255, .125);
+        -webkit-transition: all .2s linear;
+        -moz-transition: all .2s linear;
+        transition: all .2s linear;
+      }
     </style>
   </head>
   <body>
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container">
-          <a class="brand" href="/"><img src="/img/logo.png"> WebCritic</a>
+          <a class="brand" href="/">WebCritic</a>
           <div class="nav-collapse">
             <ul class="nav">
               <li>
@@ -194,7 +224,7 @@ __DATA__
 @@ config.html.ep
 % layout 'default', title => "Config";
 % unless (%$conf) {
-<form method="post" action="/config" class="form-inline">
+<form method="post" action="/config" class="span5">
   <div class="input-prepend input-append">
     <span class="add-on">Select config</span>
     <select name="file">
@@ -205,7 +235,7 @@ __DATA__
     <a type="submit" class="btn">Select</a>
   </div>
 </form>
-Or create <a href="/config/new" class="btn btn-small btn-success" type="button"><i class="icon-plus icon-white"></i> new</a> config.
+... or create <a href="/config/new" class="btn btn-success" type="button"><i class="icon-plus icon-white"></i> new</a> config.
 % } else {
 Config:
 <textarea name=config><%= dumper $conf %></textarea>
