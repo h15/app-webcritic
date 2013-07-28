@@ -65,6 +65,11 @@ use Pony::Object::Throwable;
         $self->redirect_to('/config');
       };
       
+      get '/config/new' => sub {
+        my $self = shift;
+        $self->render('config/new_form');
+      };
+      
       Mojo::Server::Daemon->new(app => app, listen => ["http://*:7357"])->run;
     }
   
@@ -154,19 +159,53 @@ __DATA__
 % layout 'default', title => "WebCritic";
 
 
+@@ config/new_form.html.ep
+% layout 'default', title => "Create new config";
+<div class="class6 offset2">
+  <form class="form-horizontal" method="post" action="/config/new">
+    <div class="control-group">
+      <label class="control-label" for="configName">Name</label>
+      <div class="controls">
+        <input type="text" id="configName" name="name" placeholder="Name">
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="configIdentifier">Identifier</label>
+      <div class="controls">
+        <input type="text" id="configIdentifier" name="identifier" placeholder="Identifier">
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="configUrl">URL</label>
+      <div class="controls">
+        <input type="text" id="configUrl" name="url" placeholder="URL">
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label"></label>
+      <div class="controls">
+        <button type="submit" class="btn">Create</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+
 @@ config.html.ep
 % layout 'default', title => "Config";
 % unless (%$conf) {
-<form method="post" action="/config">
-  <label>Select your config
+<form method="post" action="/config" class="form-inline">
+  <div class="input-prepend input-append">
+    <span class="add-on">Select config</span>
     <select name="file">
     % for my $fl (@$files) {
       <option value="<%= $fl %>"><%= $fl %></option>
     % }
     </select>
-  </label>
-  <input type="submit" class="btn btn-submit" value="Select">
+    <a type="submit" class="btn">Select</a>
+  </div>
 </form>
+Or create <a href="/config/new" class="btn btn-small btn-success" type="button"><i class="icon-plus icon-white"></i> new</a> config.
 % } else {
 Config:
 <textarea name=config><%= dumper $conf %></textarea>
