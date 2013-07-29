@@ -54,8 +54,8 @@ use Pony::Object::Throwable;
           }
           return {};
         };
-        my $files = $this->get_config_list('./conf/local');
-        return $self->stash(list => $list, conf => $conf, files => $files)->render('config');
+        my $idents = $this->get_config_list('./conf/local');
+        return $self->stash(list => $list, conf => $conf, idents => $idents)->render('config');
       };
       
       post '/config' => sub {
@@ -87,6 +87,16 @@ use Pony::Object::Throwable;
         $self->redirect_to('/config');
       };
       
+      get '/config/show/:ident' => sub {
+        my $self = shift;
+        my $ident = $self->param('ident');
+        open(my $fh, "./conf/local/$ident.json") or die "Can't read file \"./conf/local/$ident.json\"";
+        my $data = <$fh>;
+        close $fh;
+        $data = decode_json($data);
+        $self->render('config/show', $data);
+      };
+      
       Mojo::Server::Daemon->new(app => app, listen => ["http://*:7357"])->run;
     }
   
@@ -108,7 +118,8 @@ use Pony::Object::Throwable;
         next unless -f $file;
         next if $file =~ /\/\..*?$/;
         next if $file !~ /\.json$/;
-        push @list, $file;
+        my ($ident) = ($file =~ m/([^\/]*)\.json$/);
+        push @list, $ident;
       }
       
       return \@list;
@@ -189,6 +200,38 @@ __DATA__
 % layout 'default', title => "WebCritic";
 
 
+@@ config/show.html.ep
+% layout 'default', title => "Edit config $ident";
+<div class="class6 offset2">
+  <form class="form-horizontal" method="post" action=<%= url_for(config_edit => ident => $ident>
+    <div class="control-group">
+      <label class="control-label" for="configName">Name</label>
+      <div class="controls">
+        <input type="text" id="configName" name="name" placeholder="Name" value="<%= $name %>">
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="configIdentifier">Identifier</label>
+      <div class="controls">
+        <input type="text" id="configIdentifier" name="identifier" disabled="disabled" placeholder="Identifier" value="<%= $ident %>">
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="configUrl">URL</label>
+      <div class="controls">
+        <input type="text" id="configUrl" name="url" placeholder="URL" value="<%= $url %>">
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label"></label>
+      <div class="controls">
+        <button type="submit" class="btn">Create</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+
 @@ config/new_form.html.ep
 % layout 'default', title => "Create new config";
 <div class="class6 offset2">
@@ -228,7 +271,7 @@ __DATA__
   <div class="input-prepend input-append">
     <span class="add-on">Select config</span>
     <select name="file">
-    % for my $fl (@$files) {
+    % for my $fl (@$idents) {
       <option value="<%= $fl %>"><%= $fl %></option>
     % }
     </select>
