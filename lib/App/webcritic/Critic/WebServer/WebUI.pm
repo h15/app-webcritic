@@ -53,6 +53,8 @@ use Pony::Object::Throwable;
             return decode_json($data);
           }
           return {};
+        } catch {
+          return {};
         };
         my $idents = $this->get_config_list('./conf/local');
         return $self->stash(list => $list, conf => $conf, idents => $idents)->render('config');
@@ -72,9 +74,13 @@ use Pony::Object::Throwable;
       
       post '/config/new' => sub {
         my $self = shift;
-        my ($name, $ident, $url) = ($self->param('name'), $self->param('identifier'), $self->param('url'));
+        my $name = $self->param('name') or die 'Name must be defined';
+        my $ident= $self->param('identifier') or die 'Identifier must be defined';
+        my $url  = $self->param('url') or die 'Url must be defined';
+        
         die qq{File "./conf/local/$ident.json" already exists} if -f "./conf/local/$ident.json";
         open(my $fh, ">>", "./conf/local/$ident.json") or die "Can't create file ./conf/local/$ident.json";
+        
         say $fh encode_json({
           "site_list" => [
             {
@@ -83,11 +89,12 @@ use Pony::Object::Throwable;
             }
           ]
         });
+        
         close $fh;
         $self->redirect_to('/config');
       };
       
-      get '/config/show/:ident' => sub {
+      get '/config/show/:ident' => [ident => qr/[a-zA-Z0-9]+/] => sub {
         my $self = shift;
         my $ident = $self->param('ident');
         open(my $fh, "./conf/local/$ident.json") or die "Can't read file \"./conf/local/$ident.json\"";
@@ -139,6 +146,7 @@ __DATA__
     <meta name="generator" content="WebCritic/<%= $App::webcritic::VERSION %>">
     <script src="/js/jquery.min.js"></script>
     <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/main.js"></script>
     <title><%= title %> - WebCritic/<%= $App::webcritic::VERSION %></title>
     <style>
       body { width: 100%; }
@@ -261,21 +269,29 @@ __DATA__
       </div>
     </div>
   </form>
+  <script>
+    $(document).ready(function() {
+      $('#configName').keyup(function() {
+        $('#configIdentifier').val( trCyrillicToLatin($(this).val()) );
+      });
+    });
+  </script>
 </div>
 
 
 @@ config.html.ep
 % layout 'default', title => "Config";
 % unless (%$conf) {
-<form method="post" action="/config" class="span5">
+<form method="post" action="/config/show" class="span5">
   <div class="input-prepend input-append">
     <span class="add-on">Select config</span>
-    <select name="file">
+    <select name="ident">
     % for my $fl (@$idents) {
       <option value="<%= $fl %>"><%= $fl %></option>
     % }
     </select>
-    <a type="submit" class="btn">Select</a>
+    <button type="button" class="btn"
+      onClick="window.location = $(this).parent().parent().attr('action') + '/' + $(this).parent().parent().find('select').val()">Select</button>
   </div>
 </form>
 ... or create <a href="/config/new" class="btn btn-success" type="button"><i class="icon-plus icon-white"></i> new</a> config.
