@@ -82,12 +82,10 @@ use Pony::Object::Throwable;
         open(my $fh, ">>", "./conf/local/$ident.json") or die "Can't create file ./conf/local/$ident.json";
         
         say $fh encode_json({
-          "site_list" => [
-            {
-              "url" => $url,
-              "name" => $name,
-            }
-          ]
+          "site_list" => [{
+            "url" => $url,
+            "name" => $name,
+          }]
         });
         
         close $fh;
@@ -101,6 +99,23 @@ use Pony::Object::Throwable;
         my $data = <$fh>;
         close $fh;
         $data = decode_json($data);
+        
+        # Fill empty options' fields
+        for my $i (keys @{$data->{site_list}}) {
+          $data->{site_list}->{$i}->{options} = {} unless exists $data->{site_list}->{$i}->{options};
+          $data->{site_list}->{$i}->{options}->{log} = {
+            "level"   => "debug",
+            "adaptor" => "App::webcritic::Critic::Log::Adaptor::SimpleTerm",
+            "options" => { "path" => "./log/local" }
+          } unless exists $data->{site_list}->{$i}->{options}->{log};
+          $data->{site_list}->{$i}->{options}->{sleep} = 1
+            unless exists $data->{site_list}->{$i}->{options}->{sleep};
+          $data->{site_list}->{$i}->{options}->{exclude} = []
+            unless exists $data->{site_list}->{$i}->{options}->{exclude};
+          $data->{site_list}->{$i}->{options}->{policies} = {}
+            unless exists $data->{site_list}->{$i}->{options}->{policies};
+        }
+        
         $self->stash(%$data)->render('config/show');
       };
       
@@ -214,32 +229,44 @@ __DATA__
 
 @@ config/show.html.ep
 % layout 'default', title => "Edit config $ident";
-% for (@$site_list) {
-%   my $name = $_->{name};
-%   my $url  = $_->{url};
+% for my $i (keys @$site_list) {
+%   my $name = $site_list->[$i]->{name};
+%   my $url  = $site_list->[$i]->{url};
 <h2>Website "<%= $name %>"</h2>
 <div class="class6 offset2">
   <form class="form-horizontal" method="post" action=<%= url_for(config_edit => ident => $ident) %>>
     <div class="control-group">
-      <label class="control-label" for="configName">Name</label>
+      <label class="control-label" for="configName-<%= $i %>">Name</label>
       <div class="controls">
-        <input type="text" id="configName" name="name" placeholder="Name" value="<%= $name %>">
+        <input type="text" id="configName-<%= $i %>" name="name[]" placeholder="Name" value="<%= $name %>">
       </div>
     </div>
     <div class="control-group">
-      <label class="control-label" for="configIdentifier">Identifier</label>
+      <label class="control-label" for="configIdentifier-<%= $i %>">Identifier</label>
       <div class="controls">
-        <input type="text" id="configIdentifier" name="identifier" disabled="disabled" placeholder="Identifier" value="<%= $ident %>">
+        <input type="text" id="configIdentifier-<%= $i %>" name="identifier[]"
+          disabled="disabled" placeholder="Identifier" value="<%= $ident %>">
       </div>
     </div>
     <div class="control-group">
-      <label class="control-label" for="configUrl">URL</label>
+      <label class="control-label" for="configUrl-<%= $i %>">URL</label>
       <div class="controls">
-        <input type="text" id="configUrl" name="url" placeholder="URL" value="<%= $url %>">
+        <input type="text" id="configUrl-<%= $i %>" name="url[]" placeholder="URL" value="<%= $url %>">
       </div>
     </div>
     <div class="control-group">
-      <label class="control-label"></label>
+      <label class="control-label" for="configLog-<%= $i %>">Log level</label>
+      <div class="controls">
+        <select id="configLog-<%= $i %>" name="log[]"">
+        % for ()
+          <option value>
+        </select>
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label">
+        <button type="reset" class="btn btn-link">Cancel</button>
+      </label>
       <div class="controls">
         <button type="submit" class="btn">Edit</button>
       </div>
@@ -301,10 +328,12 @@ __DATA__
     % }
     </select>
     <button type="button" class="btn"
-      onClick="window.location = $(this).parent().parent().attr('action') + '/' + $(this).parent().parent().find('select').val()">Select</button>
+      onClick="window.location = $(this).parent().parent().attr('action')
+        + '/' + $(this).parent().parent().find('select').val()">Select</button>
   </div>
 </form>
-... or create <a href="/config/new" class="btn btn-success" type="button"><i class="icon-plus icon-white"></i> new</a> config.
+... or create <a href="/config/new" class="btn btn-success" type="button">
+  <i class="icon-plus icon-white"></i> new</a> config.
 % } else {
 Config:
 <textarea name=config><%= dumper $conf %></textarea>
