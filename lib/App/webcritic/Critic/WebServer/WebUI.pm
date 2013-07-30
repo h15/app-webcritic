@@ -121,6 +121,7 @@ use Pony::Object::Throwable;
       
       post '/config/show/:ident' => sub {
         my $self = shift;
+        my $ident = $self->param('ident');
       } => 'config_edit';
       
       Mojo::Server::Daemon->new(app => app, listen => ["http://*:7357"])->run;
@@ -232,9 +233,11 @@ __DATA__
 % for my $i (keys @$site_list) {
 %   my $name = $site_list->[$i]->{name};
 %   my $url  = $site_list->[$i]->{url};
+%   my $opt  = $site_list->[$i]->{options};
 <h2>Website "<%= $name %>"</h2>
 <div class="class6 offset2">
   <form class="form-horizontal" method="post" action=<%= url_for(config_edit => ident => $ident) %>>
+    <input type="hidden" name="offset" value="<%= $i %>">
     <div class="control-group">
       <label class="control-label" for="configName-<%= $i %>">Name</label>
       <div class="controls">
@@ -255,10 +258,42 @@ __DATA__
       </div>
     </div>
     <div class="control-group">
-      <label class="control-label" for="configLog-<%= $i %>">Log level</label>
+      <label class="control-label" for="configLogLevel-<%= $i %>">Log level</label>
       <div class="controls">
-        <select id="configLog-<%= $i %>" name="log[]">
+        <select id="configLogLevel-<%= $i %>" name="log[][level]">
+          <option <%= ($opt->{log}->{level} eq 'debug' ? 'selected=selected' : '') %>>debug</option>
+          <option <%= ($opt->{log}->{level} eq 'info'  ? 'selected=selected' : '') %>>info</option>
+          <option <%= ($opt->{log}->{level} eq 'warn'  ? 'selected=selected' : '') %>>warn</option>
+          <option <%= ($opt->{log}->{level} eq 'error' ? 'selected=selected' : '') %>>error</option>
+          <option <%= ($opt->{log}->{level} eq 'fatal' ? 'selected=selected' : '') %>>fatal</option>
+          <option <%= ($opt->{log}->{level} eq 'off'   ? 'selected=selected' : '') %>>off</option>
         </select>
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="configLogAdaptor-<%= $i %>">Log adaptor</label>
+      <div class="controls">
+        <input type="text" id="configLogAdaptor-<%= $i %>" name="log[][adaptor]"
+          placeholder="Adaptor" value="<%= $opt->{log}->{adaptor} %>">
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="configLogOptionsPath-<%= $i %>">Log adaptor</label>
+      <div class="controls">
+        <input type="text" id="configLogOptionsPath-<%= $i %>" name="log[][adaptor][options][path]"
+          placeholder="Path" value="<%= $opt->{log}->{options}->{path} %>">
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="configSleep-<%= $i %>">Sleep (in sec)</label>
+      <div class="controls">
+        <input type="text" id="configSleep-<%= $i %>" name="sleep[]" placeholder="Sleep" value="<%= $opt->{sleep} %>">
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="configExclude-<%= $i %>">Exclude (path list)</label>
+      <div class="controls">
+        <input type="text" id="configExclude-<%= $i %>" name="exclude[]" placeholder="Exclude path" value="<%= join(', ', @{$opt->{exclude}}) %>">
       </div>
     </div>
     <div class="control-group">
