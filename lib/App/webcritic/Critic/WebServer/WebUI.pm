@@ -102,18 +102,18 @@ use Pony::Object::Throwable;
         
         # Fill empty options' fields
         for my $i (keys @{$data->{site_list}}) {
-          $data->{site_list}->{$i}->{options} = {} unless exists $data->{site_list}->{$i}->{options};
-          $data->{site_list}->{$i}->{options}->{log} = {
+          $data->{site_list}->[$i]->{options} = {} unless exists $data->{site_list}->[$i]->{options};
+          $data->{site_list}->[$i]->{options}->{log} = {
             "level"   => "debug",
             "adaptor" => "App::webcritic::Critic::Log::Adaptor::SimpleTerm",
             "options" => { "path" => "./log/local" }
-          } unless exists $data->{site_list}->{$i}->{options}->{log};
-          $data->{site_list}->{$i}->{options}->{sleep} = 1
-            unless exists $data->{site_list}->{$i}->{options}->{sleep};
-          $data->{site_list}->{$i}->{options}->{exclude} = []
-            unless exists $data->{site_list}->{$i}->{options}->{exclude};
-          $data->{site_list}->{$i}->{options}->{policies} = {}
-            unless exists $data->{site_list}->{$i}->{options}->{policies};
+          } unless exists $data->{site_list}->[$i]->{options}->{log};
+          $data->{site_list}->[$i]->{options}->{sleep} = 1
+            unless exists $data->{site_list}->[$i]->{options}->{sleep};
+          $data->{site_list}->[$i]->{options}->{exclude} = []
+            unless exists $data->{site_list}->[$i]->{options}->{exclude};
+          $data->{site_list}->[$i]->{options}->{policies} = {}
+            unless exists $data->{site_list}->[$i]->{options}->{policies};
         }
         
         $self->stash(%$data)->render('config/show');
@@ -257,9 +257,7 @@ __DATA__
     <div class="control-group">
       <label class="control-label" for="configLog-<%= $i %>">Log level</label>
       <div class="controls">
-        <select id="configLog-<%= $i %>" name="log[]"">
-        % for ()
-          <option value>
+        <select id="configLog-<%= $i %>" name="log[]">
         </select>
       </div>
     </div>
