@@ -94,15 +94,19 @@ use Pony::Object::Throwable;
         $self->redirect_to('/config');
       };
       
-      get '/config/show/:ident' => [ident => qr/[a-zA-Z0-9]+/] => sub {
+      get '/config/show/:ident' => sub {
         my $self = shift;
         my $ident = $self->param('ident');
-        open(my $fh, "./conf/local/$ident.json") or die "Can't read file \"./conf/local/$ident.json\"";
+        open(my $fh, "./conf/local/$ident.json") or return $self->render_not_found;
         my $data = <$fh>;
         close $fh;
         $data = decode_json($data);
-        $self->render('config/show', $data);
+        $self->stash(%$data)->render('config/show');
       };
+      
+      post '/config/show/:ident' => sub {
+        my $self = shift;
+      } => 'config_edit';
       
       Mojo::Server::Daemon->new(app => app, listen => ["http://*:7357"])->run;
     }
@@ -210,8 +214,12 @@ __DATA__
 
 @@ config/show.html.ep
 % layout 'default', title => "Edit config $ident";
+% for (@$site_list) {
+%   my $name = $_->{name};
+%   my $url  = $_->{url};
+<h2>Website "<%= $name %>"</h2>
 <div class="class6 offset2">
-  <form class="form-horizontal" method="post" action=<%= url_for(config_edit => ident => $ident>
+  <form class="form-horizontal" method="post" action=<%= url_for(config_edit => ident => $ident) %>>
     <div class="control-group">
       <label class="control-label" for="configName">Name</label>
       <div class="controls">
@@ -233,11 +241,13 @@ __DATA__
     <div class="control-group">
       <label class="control-label"></label>
       <div class="controls">
-        <button type="submit" class="btn">Create</button>
+        <button type="submit" class="btn">Edit</button>
       </div>
     </div>
   </form>
 </div>
+<hr>
+% }
 
 
 @@ config/new_form.html.ep
