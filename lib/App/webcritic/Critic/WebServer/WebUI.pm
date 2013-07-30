@@ -9,6 +9,7 @@ use Mojolicious::Lite;
 use Pony::Object qw/:try App::webcritic::Critic::Log::AbstractLogger/;
 use Mojo::IOLoop;
 use Mojo::Server::Daemon;
+use Mojo::JSON 'j';
 use Pony::Object::Throwable;
   
   protected 'config';
@@ -94,6 +95,7 @@ use Pony::Object::Throwable;
       
       get '/config/show/:ident' => sub {
         my $self = shift;
+        local $/;
         my $ident = $self->param('ident');
         open(my $fh, "./conf/local/$ident.json") or return $self->render_not_found;
         my $data = <$fh>;
@@ -294,6 +296,32 @@ __DATA__
       <label class="control-label" for="configExclude-<%= $i %>">Exclude (path list)</label>
       <div class="controls">
         <input type="text" id="configExclude-<%= $i %>" name="exclude[]" placeholder="Exclude path" value="<%= join(', ', @{$opt->{exclude}}) %>">
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="configWebsitePolicies-<%= $i %>">Website policies</label>
+      <div class="controls">
+        <ul>
+        % for my $p (@{ $opt->{policies}->{site} }) {
+          <li>
+            <b><%= $p->{name} %></b>
+            <%= $p->{module} %>
+          </li>
+        % }
+        </ul>
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="configPagePolicies-<%= $i %>">Page policies</label>
+      <div class="controls">
+        <ul>
+        % for my $p (@{ $opt->{policies}->{page} }) {
+            <li>
+              <b><%= $p->{name} %></b>
+              <%= $p->{module} %>
+            </li>
+        % }
+        </ul>
       </div>
     </div>
     <div class="control-group">
