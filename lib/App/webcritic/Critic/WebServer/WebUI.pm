@@ -301,27 +301,37 @@ __DATA__
     <div class="control-group">
       <label class="control-label" for="configWebsitePolicies-<%= $i %>">Website policies</label>
       <div class="controls">
-        <ul>
+        <table class="table table-bordered table-striped">
         % for my $p (@{ $opt->{policies}->{site} }) {
-          <li>
-            <b><%= $p->{name} %></b>
-            <%= $p->{module} %>
-          </li>
+          <tr>
+            <td><%= $p->{name} %><input type="hidden" name="website-policy[][name][]" value="<%= $p->{name} %>"></td>
+            <td><%= $p->{module} %><input type="hidden" name="website-policy[][module][]" value="<%= $p->{module} %>"></td>
+          </tr>
         % }
-        </ul>
+        </table>
+        <div class="add-website-policy">
+          <input type="text" class="name" placeholder="Name">
+          <input type="text" class="module" placeholder="Module">
+          <button type="button" class="btn"><i class="icon-plus"></i> Add</button>
+        </div>
       </div>
     </div>
     <div class="control-group">
       <label class="control-label" for="configPagePolicies-<%= $i %>">Page policies</label>
       <div class="controls">
-        <ul>
+        <table class="table table-bordered table-striped">
         % for my $p (@{ $opt->{policies}->{page} }) {
-            <li>
-              <b><%= $p->{name} %></b>
-              <%= $p->{module} %>
-            </li>
+            <tr>
+              <td><%= $p->{name} %><input type="hidden" name="page-policy[][name][]" value="<%= $p->{name} %>"></td>
+              <td><%= $p->{module} %><input type="hidden" name="page-policy[][module][]" value="<%= $p->{module} %>"></td>
+            </tr>
         % }
-        </ul>
+        </table>
+        <div class="add-page-policy">
+          <input type="text" class="name" placeholder="Name">
+          <input type="text" class="module" placeholder="Module">
+          <button type="button" class="btn"><i class="icon-plus"></i> Add</button>
+        </div>
       </div>
     </div>
     <div class="control-group">
@@ -336,6 +346,28 @@ __DATA__
 </div>
 <hr>
 % }
+<script>
+  $(document).ready(function() {
+    $('.add-page-policy .btn[type=button]').click(function() {
+      if ($(this).parent().find('.name').val() != '' && $(this).parent().find('.module').val() != '') {
+        $(this).parent().parent().find('table').append('<tr>'+
+          '<td>'+$(this).parent().find('.name').val()  +'<input type="hidden" name="page-policy[][name][]" value="'  +$(this).parent().find('.name').val()  +'">'+'</td>'+
+          '<td>'+$(this).parent().find('.module').val()+'<input type="hidden" name="page-policy[][module][]" value="'+$(this).parent().find('.module').val()+'">'+'</td>'+
+        '</tr>');
+      }
+      return false;
+    });
+    $('.add-website-policy .btn[type=button]').click(function() {
+      if ($(this).parent().find('.name').val() != '' && $(this).parent().find('.module').val() != '') {
+        $(this).parent().parent().find('table').append('<tr>'+
+          '<td>'+$(this).parent().find('.name').val()  +'<input type="hidden" name="website-policy[][name][]" value="'  +$(this).parent().find('.name').val()  +'">'+'</td>'+
+          '<td>'+$(this).parent().find('.module').val()+'<input type="hidden" name="website-policy[][module][]" value="'+$(this).parent().find('.module').val()+'">'+'</td>'+
+        '</tr>');
+      }
+      return false;
+    });
+  });
+</script>
 
 
 @@ config/new_form.html.ep
