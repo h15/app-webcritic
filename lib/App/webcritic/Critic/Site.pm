@@ -153,7 +153,7 @@ use App::webcritic::Critic::Site::Page::Link;
             $new_page->check_policies();
           }
         } catch {
-          say $@;
+          $this->log_error($@);
         };
       }
       
