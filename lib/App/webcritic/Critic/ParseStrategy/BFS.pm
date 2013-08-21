@@ -6,6 +6,7 @@
 package App::webcritic::Critic::ParseStrategy::BFS;
 use Pony::Object qw/App::webcritic::Critic::ParseStrategy::StrategyInterface/;
 use Pony::Object::Throwable;
+use Digest::MD5 'md5_hex';
   
   protected queue => [];
   protected visited_list_by_url  => {};
@@ -47,9 +48,10 @@ use Pony::Object::Throwable;
       my $page = shift;
       
       if ($page->isa('App::webcritic::Critic::Site::Page::Link')) {
-        
+        $this->visited_list_by_url->{$page->get_url} = 1;
       } elsif ($page->isa('App::webcritic::Critic::Site::Page')) {
-        
+        $this->visited_list_by_url->{$page->get_url} = 1;
+        $this->visited_list_by_hash->{md5_hex($page->get_content->get_content)} = 1;
       } else {
         throw Pony::Object::Throwable('Invalid param');
       }
